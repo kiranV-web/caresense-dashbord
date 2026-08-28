@@ -31,6 +31,13 @@ const Identity = styled.div`
   gap: 14px;
 `;
 
+// Centres the mark over the sidebar rail below it — the rail's icons sit
+// centred within its 68px width, but the mark's own width (42px) starts
+// flush at the rail's left edge otherwise, landing ~14px left of that centre.
+const AlignedLogoMark = styled(LogoMark)`
+  margin-left: 14px;
+`;
+
 const Title = styled.div`
   font-size: 21px;
   font-weight: 800;
@@ -52,7 +59,7 @@ export function Header({ title, subtitle, mode, onModeChange }: Readonly<HeaderP
   return (
     <Grid>
       <Identity>
-        <LogoMark size={42} />
+        <AlignedLogoMark size={42} />
         <div>
           <Title>{title}</Title>
           <Subtitle>{subtitle}</Subtitle>
