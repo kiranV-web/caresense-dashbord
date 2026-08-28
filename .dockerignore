@@ -1,0 +1,13 @@
+.env
+.env.*
+.git
+.DS_Store
+dist
+dist-ssr
+node_modules
+coverage
+*.local
+*.log
+npm-debug.log*
+docker-compose.yml
+README.md
