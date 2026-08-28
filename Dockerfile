@@ -33,5 +33,9 @@ ENV API_HOST=api \
     NGINX_ENVSUBST_FILTER=^API_
 
 EXPOSE 80
+# 127.0.0.1, not "localhost" — on some Docker hosts "localhost" resolves to
+# ::1 first and IPv6 loopback doesn't route cleanly inside the container,
+# making wget report "connection refused" even while nginx is healthy and
+# actively serving real external requests.
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget -qO- http://localhost/ >/dev/null 2>&1 || exit 1
+    CMD wget -qO- http://127.0.0.1/ >/dev/null 2>&1 || exit 1
