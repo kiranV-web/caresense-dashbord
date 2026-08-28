@@ -10,16 +10,6 @@ export function getSettings(): Promise<CallAnalysisSettings> {
   return simulateDelay(settingsState);
 }
 
-export function updateRule(ruleId: string, enabled: boolean): Promise<CallAnalysisSettings> {
-  settingsState = {
-    ...settingsState,
-    qualityRules: settingsState.qualityRules.map((rule) =>
-      rule.id === ruleId ? { ...rule, enabled } : rule,
-    ),
-  };
-  return simulateDelay(settingsState, 120);
-}
-
 export function updateIdealDuration(minutes: number): Promise<CallAnalysisSettings> {
   settingsState = { ...settingsState, idealDurationMinutes: minutes };
   return simulateDelay(settingsState, 120);

@@ -14,11 +14,7 @@ const PAGE_SIZE = 15;
 const filterItems: { value: CallsFilterValue; label: string }[] = [
   { value: "All", label: "All" },
   { value: "Resolved", label: "Resolved" },
-  { value: "Improve quality", label: "Improve quality" },
   { value: "Recurring", label: "Recurring" },
-  { value: "Requires review", label: "Requires review" },
-  { value: "Unresolved", label: "Unresolved" },
-  { value: "Analysis failed", label: "Analysis failed" },
   { value: "Dropped", label: "Dropped" },
   { value: "Rude", label: "Rude" },
 ];
@@ -34,19 +30,6 @@ const FilterBar = styled.div`
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-`;
-
-const Spacer = styled.div`
-  flex: 1;
-`;
-
-const DropdownChip = styled.button`
-  padding: 10px 18px;
-  border-radius: ${({ theme }) => theme.radii.pillLg};
-  background: ${({ theme }) => theme.colors.surface.card};
-  color: ${({ theme }) => theme.colors.text.muted};
-  font-size: 13px;
-  font-weight: 700;
 `;
 
 const TableHead = styled.div`
@@ -112,9 +95,6 @@ export function CallsPage() {
     <Stack>
       <FilterBar>
         <SegmentedControl items={filterItems} value={filter} onChange={setFilter} variant="chips" aria-label="Filter calls" />
-        <Spacer />
-        <DropdownChip type="button">Agent ▾</DropdownChip>
-        <DropdownChip type="button">Enquiry ▾</DropdownChip>
       </FilterBar>
 
       <Card padding="none" style={{ padding: "16px 26px 24px" }}>

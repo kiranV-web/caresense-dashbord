@@ -49,6 +49,10 @@ export interface CallSummary {
   /** Raw manager-attention flag, independent of `status` — a call can need
    * attention while its status pill shows something else (e.g. Dropped). */
   needsManagerAttention: boolean;
+  /** Backend call_statuses includes RUDE — the analysis pipeline forces
+   * empathy to fail on these, so this is a reliable signal independent of
+   * per-segment tone. Always false for recurring-group items. */
+  isRude: boolean;
   etiquette: EtiquetteRuleResult[];
   sentimentSpans: SentimentSpan[];
   /** Seeds the deterministic bar-height pattern behind the sentiment waveform. */

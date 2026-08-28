@@ -8,9 +8,17 @@ interface PageChrome {
   sidebarKey: SidebarKey;
 }
 
+function greeting(): string {
+  const hour = Number(
+    new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Kolkata", hour: "numeric", hourCycle: "h23" }).format(new Date()),
+  );
+  const timeOfDay = hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening";
+  return `Good ${timeOfDay}, Kiran`;
+}
+
 function chromeFor(pathname: string): PageChrome {
   if (pathname === "/") {
-    return { title: "Good morning, Alex", subtitle: "Here is what is happening with your support team today.", sidebarKey: "home" };
+    return { title: greeting(), subtitle: "Here is what is happening with your support team today.", sidebarKey: "home" };
   }
   if (pathname === "/team") {
     return { title: "Team", subtitle: "Agent performance for the selected period", sidebarKey: "team" };

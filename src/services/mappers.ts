@@ -257,6 +257,7 @@ export function mapCallListItem(item: BackendCallListItem): CallSummary {
     status: item.analysis_status === "FAILED" ? "analysis-failed"
       : callStatusFromBackend(item.resolution_status, item.call_statuses, item.needs_manager_attention),
     needsManagerAttention: item.needs_manager_attention,
+    isRude: item.call_statuses.includes("RUDE"),
     etiquette: [],
     sentimentSpans: [],
     waveSeed: seedFromId(item.id),
@@ -291,6 +292,7 @@ export function mapRecurringGroupListItem(item: BackendRecurringGroupListItem): 
     durationSeconds: num(item.duration_seconds),
     status: statusFromRecurringOutcome(item.outcome_status),
     needsManagerAttention: false,
+    isRude: false,
     etiquette: [],
     sentimentSpans: [],
     waveSeed: seedFromId(item.id),

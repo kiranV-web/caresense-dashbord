@@ -1,10 +1,8 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { Card } from "@/components/primitives/Card";
-import { ToggleSwitch } from "@/components/primitives/ToggleSwitch";
 import { useAsync } from "@/hooks/useAsync";
-import { getSettings, updateIdealDuration, updateRule } from "@/services/settingsService";
-import type { QualityRule } from "@/types/settings";
+import { getSettings, updateIdealDuration } from "@/services/settingsService";
 
 const Stack = styled.div`
   display: flex;
@@ -86,16 +84,10 @@ const RuleDesc = styled.div`
 
 export function SettingsPage() {
   const { data: settings, loading } = useAsync(getSettings, []);
-  const [rules, setRules] = useState<QualityRule[] | undefined>(undefined);
   const [duration, setDuration] = useState<number | undefined>(undefined);
 
-  const effectiveRules = rules ?? settings?.qualityRules ?? [];
+  const effectiveRules = settings?.qualityRules ?? [];
   const effectiveDuration = duration ?? settings?.idealDurationMinutes ?? 5;
-
-  async function toggleRule(ruleId: string, enabled: boolean) {
-    setRules(effectiveRules.map((r) => (r.id === ruleId ? { ...r, enabled } : r)));
-    await updateRule(ruleId, enabled);
-  }
 
   async function changeDuration(next: number) {
     setDuration(next);
@@ -120,6 +112,7 @@ export function SettingsPage() {
         <Explanation>
           Calls exceeding this duration may be highlighted for review but are not automatically treated as poor quality.
         </Explanation>
+        <Explanation>Not yet implemented.</Explanation>
       </Card>
 
       <Card padding="wide">
@@ -132,7 +125,6 @@ export function SettingsPage() {
                 <RuleName>{rule.name}</RuleName>
                 <RuleDesc>{rule.description}</RuleDesc>
               </RuleText>
-              <ToggleSwitch checked={rule.enabled} onChange={(next) => void toggleRule(rule.id, next)} label={rule.name} />
             </RuleRow>
           ))}
         </div>

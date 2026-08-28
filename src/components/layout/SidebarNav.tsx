@@ -12,12 +12,12 @@ const navItems: { key: SidebarKey; label: string; Icon: typeof Home }[] = [
   { key: "home", label: "Home", Icon: Home },
   { key: "team", label: "Team", Icon: Users },
   { key: "calls", label: "Calls", Icon: Phone },
-  { key: "settings", label: "Settings", Icon: Settings },
 ];
 
 const Rail = styled.nav`
   width: 68px;
   flex: none;
+  height: calc(100vh - 68px);
   background: ${({ theme }) => theme.colors.surface.card};
   border-radius: ${({ theme }) => theme.radii.navRail};
   padding: 14px 0;
@@ -43,7 +43,7 @@ const IconCircle = styled.button<{ $active: boolean }>`
 `;
 
 const Spacer = styled.div`
-  height: 80px;
+  flex: 1;
 `;
 
 export function SidebarNav({ activeKey, onNavigate }: Readonly<SidebarNavProps>) {
@@ -55,7 +55,10 @@ export function SidebarNav({ activeKey, onNavigate }: Readonly<SidebarNavProps>)
         </IconCircle>
       ))}
       <Spacer />
-      <IconCircle type="button" title="Log out" aria-label="Log out" $active={false}>
+      <IconCircle type="button" title="Settings" aria-label="Settings" $active={activeKey === "settings"} onClick={() => onNavigate("settings")}>
+        <Settings size={19} strokeWidth={1.7} />
+      </IconCircle>
+      <IconCircle type="button" title="Not implemented" aria-label="Not implemented" $active={false}>
         <LogOut size={19} strokeWidth={1.7} />
       </IconCircle>
     </Rail>

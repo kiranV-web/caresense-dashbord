@@ -18,7 +18,7 @@ import { setCallsFilter } from "@/services/callsFilterStore";
 import type { CallSummary } from "@/types/call";
 import { Maximize2, Sparkles, X } from "lucide-react";
 
-type HomeFilter = "All" | "Attention" | "Recurring" | "Unresolved" | "Dropped";
+type HomeFilter = "All" | "Resolved" | "Recurring" | "Dropped" | "Rude";
 
 const AGENT_RULE_CALLS_LIMIT = 30;
 
@@ -146,23 +146,19 @@ const IssuesFooter = styled.div`
 `;
 
 const IssuesCard = styled(Card)`
-  display: grid;
-  grid-template-rows: 7fr 3fr;
-  gap: 18px;
-`;
-
-const IssuesTop = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: 0;
 `;
 
-const CoachingTile = styled.div`
+const RightColumn = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  padding: 14px 16px;
-  border-radius: ${({ theme }) => theme.radii.panel};
+  gap: ${({ theme }) => theme.spacing.stackGap};
+`;
+
+const CoachingCard = styled(Card)`
+  display: flex;
+  flex-direction: column;
   background: ${({ theme }) => theme.colors.tone.mild.chipBg};
 `;
 
@@ -216,18 +212,18 @@ const RuleFilterChip = styled.button`
 
 const homeFilterItems: { value: HomeFilter; label: string }[] = [
   { value: "All", label: "All" },
-  { value: "Attention", label: "Attention" },
+  { value: "Resolved", label: "Resolved" },
   { value: "Recurring", label: "Recurring" },
-  { value: "Unresolved", label: "Unresolved" },
   { value: "Dropped", label: "Dropped" },
+  { value: "Rude", label: "Rude" },
 ];
 
 function matchesFilter(call: CallSummary, filter: HomeFilter): boolean {
   if (filter === "All") return true;
-  if (filter === "Attention") return call.needsManagerAttention;
+  if (filter === "Resolved") return call.status === "resolved" || call.status === "recurrence-resolved";
   if (filter === "Recurring") return call.status === "recurring";
   if (filter === "Dropped") return call.status === "dropped";
-  return call.status === "unresolved";
+  return call.isRude;
 }
 
 export function HomePage() {
@@ -335,8 +331,8 @@ export function HomePage() {
           )}
         </Card>
 
-        <IssuesCard padding="content">
-          <IssuesTop>
+        <RightColumn>
+          <IssuesCard padding="content">
             <IssuesHead>
               <CardTitle>Reported issues</CardTitle>
             </IssuesHead>
@@ -358,8 +354,8 @@ export function HomePage() {
               <IssuesEmpty>No issues reported.</IssuesEmpty>
             )}
             <IssuesFooter>Tap a row to filter these calls</IssuesFooter>
-          </IssuesTop>
-          <CoachingTile>
+          </IssuesCard>
+          <CoachingCard padding="content">
             <CoachingHead>
               <Sparkles size={13} strokeWidth={2.5} />
               Coaching insight
@@ -367,8 +363,8 @@ export function HomePage() {
             <CoachingText>
               {coachingLoading ? "Analyzing recent calls…" : (coachingInsight ?? "Coaching insight unavailable right now.")}
             </CoachingText>
-          </CoachingTile>
-        </IssuesCard>
+          </CoachingCard>
+        </RightColumn>
       </ChartsGrid>
 
       <Card padding="content">
