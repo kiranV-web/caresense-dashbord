@@ -10,14 +10,13 @@ export interface SidebarNavProps {
 
 const navItems: { key: SidebarKey; label: string; Icon: typeof Home }[] = [
   { key: "home", label: "Home", Icon: Home },
-  { key: "team", label: "Team", Icon: Users },
   { key: "calls", label: "Calls", Icon: Phone },
+  { key: "team", label: "Team", Icon: Users },
 ];
 
 const Rail = styled.nav`
   width: 68px;
   flex: none;
-  height: calc(100vh - 68px);
   background: ${({ theme }) => theme.colors.surface.card};
   border-radius: ${({ theme }) => theme.radii.navRail};
   padding: 14px 0;
@@ -42,8 +41,10 @@ const IconCircle = styled.button<{ $active: boolean }>`
   transition: background 0.2s ease;
 `;
 
+// 156px (up from the original 80px) — brings the rail's total height to
+// roughly 20% taller than before Settings/Logout were grouped together.
 const Spacer = styled.div`
-  flex: 1;
+  height: 156px;
 `;
 
 export function SidebarNav({ activeKey, onNavigate }: Readonly<SidebarNavProps>) {
