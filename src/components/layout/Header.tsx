@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { SegmentedControl, type SegmentedItem } from "@/components/primitives/SegmentedControl";
+import { LogoMark } from "@/components/brand/LogoMark";
 
 export type AppMode = "upload" | "dash" | "chat";
 
@@ -30,20 +31,6 @@ const Identity = styled.div`
   gap: 14px;
 `;
 
-const Mark = styled.div`
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.colors.accent.green};
-  color: ${({ theme }) => theme.colors.text.onAccent};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 14px;
-  flex: none;
-`;
-
 const Title = styled.div`
   font-size: 21px;
   font-weight: 800;
@@ -65,7 +52,7 @@ export function Header({ title, subtitle, mode, onModeChange }: Readonly<HeaderP
   return (
     <Grid>
       <Identity>
-        <Mark>CI</Mark>
+        <LogoMark size={42} />
         <div>
           <Title>{title}</Title>
           <Subtitle>{subtitle}</Subtitle>

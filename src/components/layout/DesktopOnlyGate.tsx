@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import type { ReactNode } from "react";
+import { LogoMark } from "@/components/brand/LogoMark";
 
 const DesktopContent = styled.div`
   display: block;
@@ -25,17 +26,7 @@ const MobileNotice = styled.div`
   }
 `;
 
-const Mark = styled.div`
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.colors.accent.green};
-  color: ${({ theme }) => theme.colors.text.onAccent};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 14px;
+const MarkWrap = styled.div`
   margin-bottom: 8px;
 `;
 
@@ -65,7 +56,7 @@ export function DesktopOnlyGate({ children }: Readonly<{ children: ReactNode }>)
     <>
       <DesktopContent>{children}</DesktopContent>
       <MobileNotice>
-        <Mark>CI</Mark>
+        <MarkWrap><LogoMark size={42} /></MarkWrap>
         <Heading>Desktop only</Heading>
         <Body>CareSense Call Centre Intelligence is designed for desktop screens. Please reopen it on a larger display.</Body>
       </MobileNotice>

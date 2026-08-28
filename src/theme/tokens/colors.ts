@@ -115,6 +115,20 @@ export const colors = {
   // The semantic tones the whole app draws meaning from (never decorative —
   // see README "Semantic rule"). Every status pill, sentiment chip, rule
   // pass/fail mark and waveform span resolves to one of these.
+  // The Call Sense logo's own fixed brand colors — deliberately not routed
+  // through the semantic `tone` system (a logo isn't a status signal, its
+  // colors don't change meaning by context the way tone colors do). `small`
+  // is a fixed, darker sage used for the outer arc at <=20px on either
+  // light or dark backgrounds, since the paler light-mode sage (`a9c5ac`)
+  // washes out once the stroke thins below ~20px.
+  logo: {
+    dotAndInner: { light: "#1b1c1a", dark: "#f4f2ee" },
+    outerArc: { light: "#a9c5ac", dark: "#7f9e84", small: "#7f9e84" },
+    wordmark: {
+      call: { light: "#1b1c1a", dark: "#f4f2ee" },
+      sense: { light: "#5b5d57", dark: "#9a9c95" },
+    },
+  },
   tone: {
     neutral: { chipBg: "#f2f0eb", chipFg: "#8b8d86", wave: "#d5d3ce", solid: "#eeece7" },
     // A low-intensity green for calm/neutral moments — distinct from true
