@@ -16,6 +16,10 @@ const BodyRow = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.sidebarToContent};
   align-items: flex-start;
+
+  @media (max-width: 1280px) {
+    gap: 20px;
+  }
 `;
 
 const Content = styled.div`

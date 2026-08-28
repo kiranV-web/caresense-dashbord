@@ -31,6 +31,15 @@ const Row = styled.button`
   font-weight: 700;
   width: 100%;
   text-align: left;
+  padding: 6px;
+  margin: -6px;
+  border-radius: ${({ theme }) => theme.radii.panel};
+  transition: background 0.18s ease, transform 0.18s ease;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.surface.hover};
+    transform: translateX(2px);
+  }
 `;
 
 const Summary = styled.span`

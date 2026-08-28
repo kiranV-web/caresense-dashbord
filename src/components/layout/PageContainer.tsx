@@ -13,5 +13,5 @@ export const PageContainer = styled.div`
 export const PageInner = styled.div`
   max-width: 1560px;
   margin: 0 auto;
-  min-width: 1160px;
+  min-width: 0;
 `;

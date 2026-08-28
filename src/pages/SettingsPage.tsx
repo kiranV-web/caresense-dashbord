@@ -41,6 +41,14 @@ const DurationInput = styled.input`
   font-weight: 800;
   color: ${({ theme }) => theme.colors.text.primary};
   outline: none;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+
+  &:focus-visible {
+    background: ${({ theme }) => theme.colors.surface.card};
+    border-color: ${({ theme }) => theme.colors.interaction.focusOutline};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.interaction.focusRing};
+  }
 `;
 
 const MinutesLabel = styled.span`
@@ -104,6 +112,7 @@ export function SettingsPage() {
           <DurationInput
             type="number"
             min={1}
+            aria-label="Ideal call duration in minutes"
             value={effectiveDuration}
             onChange={(e) => void changeDuration(Number(e.target.value) || 1)}
           />

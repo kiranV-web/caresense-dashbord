@@ -17,6 +17,13 @@ const Back = styled.button`
   font-size: 13px;
   font-weight: 800;
   margin-bottom: 12px;
+  border-radius: ${({ theme }) => theme.radii.pillLg};
+  transition: color 0.18s ease, transform 0.18s ease;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.text.primary};
+    transform: translateX(-2px);
+  }
 `;
 
 const Header = styled(Card)`

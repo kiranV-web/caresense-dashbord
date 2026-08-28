@@ -1,5 +1,5 @@
 export const spacing = {
-  pagePadding: "34px 42px 52px",
+  pagePadding: "34px clamp(20px, 3vw, 42px) 52px",
   stackGap: "28px",
   headerToContent: "32px",
   sidebarToContent: "28px",

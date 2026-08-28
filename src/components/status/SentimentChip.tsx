@@ -17,7 +17,22 @@ const Dot = styled.span<{ $fg: string }>`
 `;
 
 const Clickable = styled.button`
-  display: contents;
+  display: inline-flex;
+  border-radius: ${({ theme }) => theme.radii.full};
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.interaction.focusRing};
+  }
 `;
 
 export function SentimentChip({

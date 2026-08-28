@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import styled, { keyframes, useTheme } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/primitives/Card";
@@ -81,7 +81,19 @@ const AgentSelect = styled.select`
   color: ${({ theme }) => theme.colors.text.secondary};
   font-size: 12.5px;
   font-weight: 700;
-  border: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.surface.hover};
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.interaction.focusOutline};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.interaction.focusRing};
+  }
 `;
 
 const RadarLoading = styled.div`
@@ -114,6 +126,7 @@ const IssueRowHead = styled.div`
 
   span:last-child {
     color: ${({ theme }) => theme.colors.text.muted};
+    font-variant-numeric: tabular-nums;
   }
 `;
 
@@ -128,6 +141,7 @@ const IssueFill = styled.div<{ $percent: number; $color: string }>`
   border-radius: 4px;
   width: ${({ $percent }) => $percent}%;
   background: ${({ $color }) => $color};
+  transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 `;
 
 const IssuesEmpty = styled.div`
@@ -267,7 +281,7 @@ const CoachingTitle = styled.div`
 const CoachingText = styled.div`
   margin-top: 4px;
   font-size: 12.25px;
-  font-weight: 550;
+  font-weight: 600;
   line-height: 1.5;
   color: ${({ theme }) => theme.colors.text.secondary};
 `;
@@ -297,6 +311,17 @@ const RuleFilterChip = styled.button`
   color: ${({ theme }) => theme.colors.tone.caution.chipFg};
   font-size: 12.5px;
   font-weight: 700;
+  border: 1px solid transparent;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.tone.caution.solid};
+    border-color: ${({ theme }) => theme.colors.pastel.amber};
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
 `;
 
 const homeFilterItems: { value: HomeFilter; label: string }[] = [
@@ -322,14 +347,17 @@ export function HomePage() {
   const { data: team } = useAsync(() => getTeamOverview(), []);
   const { data: coachingInsight, loading: coachingLoading } = useAsync(() => getTeamCoachingInsight(), []);
   const [filter, setFilter] = useState<HomeFilter>("All");
-  const [selectedAgentId, setSelectedAgentId] = useState<string | undefined>();
+  const [selectedAgentOverride, setSelectedAgentOverride] = useState<string | undefined>();
   const [selectedRule, setSelectedRule] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (selectedAgentId || !team || team.agents.length === 0) return;
-    const busiest = [...team.agents].sort((a, b) => b.callsCount - a.callsCount)[0]!;
-    setSelectedAgentId(busiest.id);
-  }, [team, selectedAgentId]);
+  const defaultAgentId = useMemo(() => {
+    if (!team || team.agents.length === 0) return undefined;
+    return team.agents.reduce((busiest, agent) =>
+      agent.callsCount > busiest.callsCount ? agent : busiest).id;
+  }, [team]);
+  const selectedAgentId = selectedAgentOverride && team?.agents.some((agent) => agent.id === selectedAgentOverride)
+    ? selectedAgentOverride
+    : defaultAgentId;
 
   const { data: quality, loading: qualityLoading } = useAsync(
     () => (selectedAgentId ? getAgentConversationQuality(selectedAgentId) : Promise.resolve(undefined)),
@@ -401,7 +429,7 @@ export function HomePage() {
                 <AgentSelect
                   value={selectedAgentId ?? ""}
                   onChange={(event) => {
-                    setSelectedAgentId(event.target.value);
+                    setSelectedAgentOverride(event.target.value);
                     setSelectedRule(null);
                   }}
                   aria-label="Select agent"

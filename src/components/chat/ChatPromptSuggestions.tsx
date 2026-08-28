@@ -13,6 +13,18 @@ const Chip = styled.button`
   font-size: 12.5px;
   font-weight: 700;
   color: ${({ theme }) => theme.colors.text.secondary};
+  border: 1px solid transparent;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.surface.hover};
+    border-color: ${({ theme }) => theme.colors.line.input};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.98);
+  }
 `;
 
 export interface ChatPromptSuggestionsProps {

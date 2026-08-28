@@ -17,14 +17,15 @@ const THINKING_STEPS = ["Thinking", "Checking call records", "Crunching the numb
 function useThinkingStatus(active: boolean): string {
   const [step, setStep] = useState(0);
   useEffect(() => {
-    if (!active) {
-      setStep(0);
-      return;
-    }
+    if (!active) return;
+    const resetTimer = window.setTimeout(() => setStep(0), 0);
     const timer = setInterval(() => setStep((prev) => (prev + 1) % THINKING_STEPS.length), 1800);
-    return () => clearInterval(timer);
+    return () => {
+      window.clearTimeout(resetTimer);
+      clearInterval(timer);
+    };
   }, [active]);
-  return THINKING_STEPS[step]!;
+  return active ? THINKING_STEPS[step]! : THINKING_STEPS[0]!;
 }
 
 const Grid = styled.div`
@@ -62,6 +63,13 @@ const Composer = styled.form`
   background: ${({ theme }) => theme.colors.surface.sunken};
   border: 1.5px solid ${({ theme }) => theme.colors.surface.mutedAlt};
   padding: 8px 8px 8px 20px;
+  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+
+  &:focus-within {
+    background: ${({ theme }) => theme.colors.surface.card};
+    border-color: ${({ theme }) => theme.colors.interaction.focusOutline};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.interaction.focusRing};
+  }
 `;
 
 const ComposerInput = styled.input`
@@ -84,6 +92,22 @@ const SendButton = styled.button`
   justify-content: center;
   background: ${({ theme }) => theme.colors.text.primary};
   color: ${({ theme }) => theme.colors.text.onAccent};
+  transition: background 0.18s ease, transform 0.18s ease, opacity 0.18s ease;
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background: ${({ theme }) => theme.colors.accent.deep};
+      transform: translateY(-1px);
+    }
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.94);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+  }
 `;
 
 export function ChatPage() {

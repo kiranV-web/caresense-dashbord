@@ -24,6 +24,7 @@ const Rail = styled.nav`
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  border: 1px solid ${({ theme }) => theme.colors.line.hairline};
   box-shadow: ${({ theme }) => theme.shadows.card};
   position: sticky;
   top: 34px;
@@ -38,7 +39,25 @@ const IconCircle = styled.button<{ $active: boolean }>`
   justify-content: center;
   background: ${({ $active, theme }) => ($active ? theme.colors.text.primary : "transparent")};
   color: ${({ $active, theme }) => ($active ? theme.colors.text.onAccent : theme.colors.text.muted)};
-  transition: background 0.2s ease;
+  box-shadow: ${({ $active, theme }) => ($active ? `0 5px 14px ${theme.colors.interaction.focusRing}` : "none")};
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+
+  @media (hover: hover) {
+    &:hover {
+      background: ${({ $active, theme }) => ($active ? theme.colors.text.primary : theme.colors.surface.hover)};
+      color: ${({ $active, theme }) => ($active ? theme.colors.text.onAccent : theme.colors.text.secondary)};
+      transform: translateY(-1px);
+    }
+  }
+
+  &:active {
+    transform: scale(0.94);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.interaction.focusRing};
+  }
 `;
 
 // 156px (up from the original 80px) — brings the rail's total height to

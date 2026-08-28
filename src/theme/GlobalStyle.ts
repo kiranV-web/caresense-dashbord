@@ -1,10 +1,13 @@
 import { createGlobalStyle } from "styled-components";
 
 export const GlobalStyle = createGlobalStyle`
-  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
-
   * {
     box-sizing: border-box;
+  }
+
+  html {
+    color-scheme: light;
+    scrollbar-color: ${({ theme }) => theme.colors.interaction.scrollbar} transparent;
   }
 
   html, body, #root {
@@ -17,6 +20,14 @@ export const GlobalStyle = createGlobalStyle`
     font-family: ${({ theme }) => theme.fontFamily};
     color: ${({ theme }) => theme.colors.text.primary};
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    line-height: 1.5;
+  }
+
+  ::selection {
+    background: ${({ theme }) => theme.colors.tone.mild.solid};
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 
   a {
@@ -29,8 +40,16 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   input,
-  button {
+  button,
+  textarea,
+  select {
     font-family: inherit;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: ${({ theme }) => theme.colors.text.faint};
+    opacity: 1;
   }
 
   button {
@@ -40,13 +59,41 @@ export const GlobalStyle = createGlobalStyle`
     cursor: pointer;
   }
 
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  :focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.interaction.focusOutline};
+    outline-offset: 3px;
+  }
+
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #d5d2cb;
-    border-radius: 4px;
+    background: ${({ theme }) => theme.colors.interaction.scrollbar};
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: ${({ theme }) => theme.radii.full};
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: ${({ theme }) => theme.colors.interaction.scrollbarHover};
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 `;

@@ -42,6 +42,7 @@ const StyledCard = styled.div<StyledCardProps>`
     css`
       background: ${theme.colors.accent.gradient};
       color: ${theme.colors.text.onAccent};
+      border-color: transparent;
       box-shadow: ${theme.shadows.gradientCard};
     `}
 
@@ -49,11 +50,24 @@ const StyledCard = styled.div<StyledCardProps>`
     $interactive &&
     css`
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: ${({ theme }) => theme.shadows.cardHover};
+      @media (hover: hover) {
+        &:hover {
+          transform: translateY(-2px);
+          border-color: ${({ theme }) => theme.colors.line.input};
+          box-shadow: ${({ theme }) => theme.shadows.cardHover};
+        }
+      }
+
+      &:active {
+        transform: translateY(0) scale(0.995);
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.interaction.focusRing},
+          ${({ theme }) => theme.shadows.cardHover};
       }
     `}
 `;

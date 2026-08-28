@@ -82,6 +82,13 @@ const LabelItem = styled.button<{ $x: number; $y: number; $align: "left" | "righ
   align-items: center;
   gap: 5px;
   justify-content: ${({ $align }) => ($align === "left" ? "flex-start" : $align === "right" ? "flex-end" : "center")};
+  border-radius: ${({ theme }) => theme.radii.pillLg};
+  transition: background 0.18s ease;
+
+  &:hover,
+  &:focus-visible {
+    background: ${({ theme }) => theme.colors.surface.hover};
+  }
 `;
 
 const LabelText = styled.span<{ $bold: boolean; $active: boolean }>`
@@ -189,6 +196,11 @@ export function ConversationQualityRadar({ rules, selectedRule, onSelectRule }: 
               onClick={() => onSelectRule(rule.rule)}
               onMouseEnter={(event) => showTooltip(rule, event.clientX, event.clientY)}
               onMouseLeave={() => setRadarTooltip(null)}
+              onFocus={(event) => {
+                const rect = event.currentTarget.getBoundingClientRect();
+                showTooltip(rule, rect.left + rect.width / 2, rect.top);
+              }}
+              onBlur={() => setRadarTooltip(null)}
             >
               <LabelText $bold={isPriority} $active={selectedRule === rule.rule}>
                 {isPriority && <PriorityDot $tone={markerTone(rule.agentPercent)} />}

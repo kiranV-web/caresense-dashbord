@@ -27,6 +27,7 @@ const Track = styled.div<{ $variant: SegmentedVariant }>`
       background: ${theme.colors.surface.card};
       padding: 5px;
       border-radius: ${theme.radii.full};
+      border: 1px solid ${theme.colors.line.hairline};
       box-shadow: ${theme.shadows.card};
     `}
 
@@ -62,6 +63,23 @@ const Item = styled.button<{ $active: boolean; $variant: SegmentedVariant }>`
   ${({ $variant }) => sizeByVariant[$variant]}
   background: ${({ $active, theme }) => ($active ? theme.colors.text.primary : "transparent")};
   color: ${({ $active, theme }) => ($active ? theme.colors.text.onAccent : theme.colors.text.muted)};
+  box-shadow: ${({ $active, theme }) => ($active ? theme.shadows.card : "none")};
+
+  @media (hover: hover) {
+    &:hover {
+      background: ${({ $active, theme }) => ($active ? theme.colors.text.primary : theme.colors.surface.hover)};
+      color: ${({ $active, theme }) => ($active ? theme.colors.text.onAccent : theme.colors.text.secondary)};
+    }
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.interaction.focusRing};
+  }
 
   ${({ $variant, $active, theme }) =>
     $variant === "chips" &&

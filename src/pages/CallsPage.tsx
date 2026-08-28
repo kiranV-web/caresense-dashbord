@@ -65,6 +65,17 @@ const PageChip = styled.button<{ $active?: boolean }>`
   background: ${({ $active, theme }) => ($active ? theme.colors.text.primary : theme.colors.surface.muted)};
   color: ${({ $active, theme }) => ($active ? theme.colors.text.onAccent : "inherit")};
   cursor: pointer;
+  min-width: 34px;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+
+  &:hover:not(:disabled) {
+    background: ${({ $active, theme }) => ($active ? theme.colors.text.primary : theme.colors.surface.hover)};
+    color: ${({ $active, theme }) => ($active ? theme.colors.text.onAccent : theme.colors.text.primary)};
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.94);
+  }
 
   &:disabled {
     cursor: not-allowed;

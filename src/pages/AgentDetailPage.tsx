@@ -24,6 +24,13 @@ const BackLink = styled.button`
   font-size: 13px;
   font-weight: 700;
   color: ${({ theme }) => theme.colors.text.muted};
+  border-radius: ${({ theme }) => theme.radii.pillLg};
+  transition: color 0.18s ease, transform 0.18s ease;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.text.primary};
+    transform: translateX(-2px);
+  }
 `;
 
 const NameBlock = styled.div`
@@ -49,6 +56,16 @@ const ExportButton = styled.button`
   color: ${({ theme }) => theme.colors.text.onAccent};
   font-size: 13px;
   font-weight: 700;
+  transition: background 0.18s ease, transform 0.18s ease;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.accent.deep};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.97);
+  }
 `;
 
 const KpiGrid = styled.div`

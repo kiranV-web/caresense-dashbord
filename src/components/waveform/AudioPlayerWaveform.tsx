@@ -26,6 +26,21 @@ const PlayButton = styled.button`
   justify-content: center;
   background: ${({ theme }) => theme.colors.text.primary};
   color: ${({ theme }) => theme.colors.text.onAccent};
+  transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.accent.deep};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.94);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.interaction.focusRing};
+  }
 `;
 
 const TimeLabel = styled.div`

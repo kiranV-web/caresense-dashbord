@@ -27,10 +27,22 @@ const Row = styled.div<{ $density: CallRowDensity; $showActions: boolean }>`
   padding: ${({ $density }) => ($density === "compact" ? "9px" : "14px")} 12px;
   border-radius: ${({ theme }) => theme.radii.panel};
   cursor: pointer;
-  transition: background 0.18s ease;
+  transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 
-  &:hover {
+  @media (hover: hover) {
+    &:hover {
+      background: ${({ theme }) => theme.colors.surface.hover};
+    }
+  }
+
+  &:active {
+    transform: scale(0.998);
+  }
+
+  &:focus-visible {
+    outline: none;
     background: ${({ theme }) => theme.colors.surface.hover};
+    box-shadow: inset 0 0 0 2px ${({ theme }) => theme.colors.interaction.focusOutline};
   }
 `;
 
@@ -69,6 +81,7 @@ const Duration = styled.div`
   font-size: 13px;
   font-weight: 700;
   color: ${({ theme }) => theme.colors.text.secondary};
+  font-variant-numeric: tabular-nums;
 `;
 
 const GroupSequence = styled.div`
@@ -129,9 +142,15 @@ const IconButton = styled.button`
   align-items: center;
   justify-content: center;
   color: inherit;
+  border-radius: ${({ theme }) => theme.radii.full};
+  transition: color 0.18s ease, transform 0.18s ease;
 
   &:hover {
     color: ${({ theme }) => theme.colors.text.secondary};
+  }
+
+  &:active {
+    transform: scale(0.9);
   }
 `;
 

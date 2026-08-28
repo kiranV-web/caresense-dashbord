@@ -24,6 +24,7 @@ const Value = styled.div`
   font-weight: 800;
   letter-spacing: -0.035em;
   line-height: 1.05;
+  font-variant-numeric: tabular-nums;
 `;
 
 const Label = styled.div<{ $accent: boolean }>`

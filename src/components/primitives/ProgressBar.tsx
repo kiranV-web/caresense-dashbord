@@ -21,6 +21,7 @@ const Fill = styled.div<{ $percent: number; $color: string; $height: number }>`
   width: ${({ $percent }) => Math.max(0, Math.min(100, $percent))}%;
   border-radius: ${({ $height }) => $height / 2}px;
   background: ${({ $color }) => $color};
+  transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 `;
 
 const TargetMarker = styled.div`

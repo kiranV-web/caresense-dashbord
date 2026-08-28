@@ -17,12 +17,18 @@ export const colors = {
     hairline: "#f2f0eb",
     input: "#e4e1da",
   },
+  interaction: {
+    focusOutline: "#5f7d67",
+    focusRing: "rgba(95,125,103,.22)",
+    scrollbar: "#cbc8c1",
+    scrollbarHover: "#aaa79f",
+  },
   text: {
     primary: "#1b1c1a",
     secondary: "#5b5d57",
-    muted: "#8b8d86",
-    faint: "#a8aaa3",
-    faintAlt: "#b6b8b1",
+    muted: "#656762",
+    faint: "#73756f",
+    faintAlt: "#73756f",
     onAccent: "#ffffff",
   },
   accent: {
@@ -45,13 +51,13 @@ export const colors = {
     neutral: "#d5d3ce",
   },
   chip: {
-    green: { bg: "#e6efe6", fg: "#517a58" },
-    amber: { bg: "#fbf1de", fg: "#a37b31" },
-    orange: { bg: "#fbeee4", fg: "#b5793a" },
-    red: { bg: "#fbe7e2", fg: "#b1594a" },
+    green: { bg: "#e6efe6", fg: "#4a724f" },
+    amber: { bg: "#fbf1de", fg: "#8e6827" },
+    orange: { bg: "#fbeee4", fg: "#985f2b" },
+    red: { bg: "#fbe7e2", fg: "#a04c40" },
     redSoft: "#fdf3ef",
-    neutral: { bg: "#f2f0eb", fg: "#8b8d86" },
-    calm: { bg: "#f2f0eb", fg: "#7b7d76" },
+    neutral: { bg: "#f2f0eb", fg: "#656762" },
+    calm: { bg: "#f2f0eb", fg: "#656762" },
   },
   avatarTints: ["#e4e8e1", "#e9e6df", "#dfe7de", "#e8ece6"] as const,
   heatmap: {
@@ -131,17 +137,17 @@ export const colors = {
     },
   },
   tone: {
-    neutral: { chipBg: "#f2f0eb", chipFg: "#8b8d86", wave: "#d5d3ce", solid: "#eeece7" },
+    neutral: { chipBg: "#f2f0eb", chipFg: "#656762", wave: "#d5d3ce", solid: "#eeece7" },
     // A low-intensity green for calm/neutral moments — distinct from true
     // grey-neutral (no signal) and from full positive (a genuinely good
     // moment). One step paler than "positive" on the pastel green scale
     // below — deliberately not the very palest step, which reads as barely
     // different from plain grey at the small sizes bars render at.
-    mild: { chipBg: "#eef3ed", chipFg: "#6f8f76", wave: "#bed4bf", solid: "#bed4bf" },
-    positive: { chipBg: "#e6efe6", chipFg: "#517a58", wave: "#a9c5ac", solid: "#b8cfb9" },
-    caution: { chipBg: "#fbf1de", chipFg: "#a37b31", wave: "#e8b98a", solid: "#f0d5a6" },
-    attention: { chipBg: "#fbeee4", chipFg: "#b5793a", wave: "#e8b98a", solid: "#f0d5a6" },
-    critical: { chipBg: "#fbe7e2", chipFg: "#b1594a", wave: "#dc9c92", solid: "#e8b3a8" },
+    mild: { chipBg: "#eef3ed", chipFg: "#57745e", wave: "#bed4bf", solid: "#bed4bf" },
+    positive: { chipBg: "#e6efe6", chipFg: "#4a724f", wave: "#a9c5ac", solid: "#b8cfb9" },
+    caution: { chipBg: "#fbf1de", chipFg: "#8e6827", wave: "#e8b98a", solid: "#f0d5a6" },
+    attention: { chipBg: "#fbeee4", chipFg: "#985f2b", wave: "#e8b98a", solid: "#f0d5a6" },
+    critical: { chipBg: "#fbe7e2", chipFg: "#a04c40", wave: "#dc9c92", solid: "#e8b3a8" },
   },
 } as const;
 

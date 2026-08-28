@@ -19,12 +19,25 @@ const Zone = styled.div<{ $dragging: boolean; $disabled: boolean }>`
   gap: 12px;
   cursor: ${({ $disabled }) => ($disabled ? "not-allowed" : "pointer")};
   opacity: ${({ $disabled }) => ($disabled ? 0.62 : 1)};
-  transition: background 0.2s ease, border-color 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   border-color: ${({ $dragging, theme }) => $dragging ? theme.colors.accent.green : theme.colors.upload.dropzoneBorder};
   background: ${({ $dragging, theme }) => $dragging ? theme.colors.upload.dropzoneBgHover : theme.colors.upload.dropzoneBg};
 
-  &:hover {
-    background: ${({ theme }) => theme.colors.upload.dropzoneBgHover};
+  @media (hover: hover) {
+    &:not([aria-disabled="true"]):hover {
+      background: ${({ theme }) => theme.colors.upload.dropzoneBgHover};
+      border-color: ${({ theme }) => theme.colors.pastel.green[1]};
+    }
+  }
+
+  &:not([aria-disabled="true"]):active {
+    transform: scale(0.997);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.accent.green};
+    box-shadow: 0 0 0 4px ${({ theme }) => theme.colors.interaction.focusRing};
   }
 `;
 
@@ -59,6 +72,12 @@ const BrowseButton = styled.span`
   color: ${({ theme }) => theme.colors.text.onAccent};
   font-size: 13px;
   font-weight: 700;
+  transition: transform 0.18s ease, background 0.18s ease;
+
+  ${Zone}:not([aria-disabled="true"]):hover & {
+    background: ${({ theme }) => theme.colors.accent.deep};
+    transform: translateY(-1px);
+  }
 `;
 
 export function Dropzone({ onFileSelected, disabled = false, maxSizeLabel }: Readonly<DropzoneProps>) {
