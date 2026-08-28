@@ -28,6 +28,7 @@ export const colors = {
   accent: {
     green: "#5f7d67",
     deep: "#43594a",
+    gold: "#f2b544",
     gradient: "linear-gradient(145deg,#7f9d83 0%,#5c7a64 100%)",
     gradientShadow: "rgba(92,122,100,.24)",
   },

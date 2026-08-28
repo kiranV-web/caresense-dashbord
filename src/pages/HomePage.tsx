@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import styled, { useTheme } from "styled-components";
+import styled, { keyframes, useTheme } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/primitives/Card";
 import { KpiCard } from "@/components/kpi/KpiCard";
@@ -16,7 +16,7 @@ import { getAgentConversationQuality, getTeamOverview } from "@/services/agentsS
 import { listCallsForAgent } from "@/services/callsService";
 import { setCallsFilter } from "@/services/callsFilterStore";
 import type { CallSummary } from "@/types/call";
-import { Maximize2, Sparkles, X } from "lucide-react";
+import { Maximize2, X } from "lucide-react";
 
 type HomeFilter = "All" | "Resolved" | "Recurring" | "Dropped" | "Rude";
 
@@ -138,49 +138,138 @@ const IssuesEmpty = styled.div`
   color: ${({ theme }) => theme.colors.text.muted};
 `;
 
-const IssuesFooter = styled.div`
-  padding-top: 16px;
-  font-size: 12px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.text.faint};
-`;
-
 const IssuesCard = styled(Card)`
-  display: flex;
-  flex-direction: column;
+  align-self: start;
 `;
 
 const RightColumn = styled.div`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto auto;
+  align-content: start;
   gap: ${({ theme }) => theme.spacing.stackGap};
+  min-height: 0;
+`;
+
+const coachPulse = keyframes`
+  0%, 100% {
+    opacity: 0.52;
+    transform: scale(0.82);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.16);
+  }
 `;
 
 const CoachingCard = styled(Card)`
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.colors.tone.mild.chipBg};
+  position: relative;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  overflow: hidden;
+  min-height: 180px;
+  padding: 18px 20px;
+  background: ${({ theme }) =>
+    `linear-gradient(138deg, ${theme.colors.tone.mild.chipBg} 0%, ${theme.colors.pastel.green[4]} 56%, ${theme.colors.pastel.green[3]} 100%)`};
+  border: 1px solid ${({ theme }) => theme.colors.pastel.green[2]};
+  box-shadow: ${({ theme }) => theme.shadows.cardHover};
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 24px;
+    bottom: 24px;
+    width: 4px;
+    border-radius: 0 4px 4px 0;
+    background: ${({ theme }) => theme.colors.accent.green};
+    pointer-events: none;
+  }
 `;
 
-const CoachingHead = styled.div`
-  display: flex;
+const CoachingVideoRing = styled.div`
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  padding: 5px;
+  background: ${({ theme }) => theme.colors.surface.sunken};
+  border: 1px solid ${({ theme }) => theme.colors.pastel.green[2]};
+  box-shadow: 0 8px 22px ${({ theme }) => theme.colors.accent.gradientShadow};
+  z-index: 1;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid ${({ theme }) => theme.colors.pastel.green[3]};
+    pointer-events: none;
+  }
+`;
+
+const CoachingVideo = styled.video`
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  filter: hue-rotate(310deg) saturate(0.52);
+  pointer-events: none;
+`;
+
+const CoachingCopy = styled.div`
+  position: relative;
+  min-width: 0;
+  z-index: 1;
+`;
+
+const CoachingEyebrow = styled.div`
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   color: ${({ theme }) => theme.colors.tone.mild.chipFg};
-  font-size: 11.5px;
+  background: ${({ theme }) => theme.colors.tone.mild.chipBg};
+  border-radius: ${({ theme }) => theme.radii.pillLg};
+  padding: 4px 9px;
+  font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 8px;
-  flex: none;
+  letter-spacing: 0.08em;
+
+  &::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: ${({ theme }) => theme.colors.accent.gold};
+    box-shadow: 0 0 0 4px ${({ theme }) => theme.colors.tone.caution.chipBg},
+      0 0 12px ${({ theme }) => theme.colors.accent.gold};
+    animation: ${coachPulse} 2.6s ease-in-out infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+`;
+
+const CoachingTitle = styled.div`
+  margin-top: 7px;
+  color: ${({ theme }) => theme.colors.text.primary};
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 `;
 
 const CoachingText = styled.div`
-  font-size: 13px;
-  font-weight: 600;
+  margin-top: 4px;
+  font-size: 12.25px;
+  font-weight: 550;
   line-height: 1.5;
   color: ${({ theme }) => theme.colors.text.secondary};
-  overflow-y: auto;
 `;
 
 const CallsHeadRow = styled.div`
@@ -353,16 +442,26 @@ export function HomePage() {
             ) : (
               <IssuesEmpty>No issues reported.</IssuesEmpty>
             )}
-            <IssuesFooter>Tap a row to filter these calls</IssuesFooter>
           </IssuesCard>
           <CoachingCard padding="content">
-            <CoachingHead>
-              <Sparkles size={13} strokeWidth={2.5} />
-              Coaching insight
-            </CoachingHead>
-            <CoachingText>
-              {coachingLoading ? "Analyzing recent calls…" : (coachingInsight ?? "Coaching insight unavailable right now.")}
-            </CoachingText>
+            <CoachingVideoRing aria-hidden="true">
+              <CoachingVideo
+                src="/api/v1/assets/coaching-insight-video"
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+                tabIndex={-1}
+              />
+            </CoachingVideoRing>
+            <CoachingCopy>
+              <CoachingEyebrow>AI team coach</CoachingEyebrow>
+              <CoachingTitle>Coaching focus</CoachingTitle>
+              <CoachingText>
+                {coachingLoading ? "Reviewing team performance…" : (coachingInsight ?? "Coaching insight unavailable right now.")}
+              </CoachingText>
+            </CoachingCopy>
           </CoachingCard>
         </RightColumn>
       </ChartsGrid>
