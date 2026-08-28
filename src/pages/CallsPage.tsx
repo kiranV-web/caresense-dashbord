@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/primitives/Card";
@@ -6,12 +6,10 @@ import { SegmentedControl } from "@/components/primitives/SegmentedControl";
 import { CallList } from "@/components/call/CallList";
 import { useAsync } from "@/hooks/useAsync";
 import { useCallsPageState } from "@/hooks/useCallsPageState";
-import { listAllCalls } from "@/services/callsService";
+import { listCallsPage } from "@/services/callsService";
 import type { CallsFilterValue } from "@/services/callsFilterStore";
-import type { CallSummary } from "@/types/call";
 
-const PAGE_SIZE = 10;
-const FETCH_CAP = 500;
+const PAGE_SIZE = 15;
 
 const filterItems: { value: CallsFilterValue; label: string }[] = [
   { value: "All", label: "All" },
@@ -91,48 +89,24 @@ const PageChip = styled.button<{ $active?: boolean }>`
   }
 `;
 
-function matchesFilter(call: CallSummary, filter: CallsFilterValue): boolean {
-  switch (filter) {
-    case "All":
-      return true;
-    case "Resolved":
-      return call.status === "resolved" || call.status === "recurrence-resolved";
-    case "Improve quality":
-      return call.status === "resolved_but_improve_quality";
-    case "Recurring":
-      return call.status === "recurring";
-    case "Requires review":
-      return call.needsManagerAttention;
-    case "Unresolved":
-      return call.status === "unresolved";
-    case "Analysis failed":
-      return call.status === "analysis-failed";
-    case "Dropped":
-      return call.status === "dropped";
-    case "Rude":
-      return call.sentimentSpans.some((s) => s.tone === "critical");
-  }
-}
-
 export function CallsPage() {
   const navigate = useNavigate();
-  const { data: calls } = useAsync(() => listAllCalls(FETCH_CAP), []);
   const [{ filter, page }, setFilter, setPage] = useCallsPageState();
+  const { data: result } = useAsync(() => listCallsPage(filter, page, PAGE_SIZE), [filter, page]);
 
-  const filtered = useMemo(() => (calls ?? []).filter((c) => matchesFilter(c, filter)), [calls, filter]);
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
+  const pageItems = result?.items ?? [];
+  const total = result?.pagination.total ?? 0;
+  const totalPages = Math.max(1, result?.pagination.total_pages ?? 1);
 
+  // Backend page numbers are only known once a response comes back — if a
+  // stale page number (e.g. from a shrunk result set) is now out of range,
+  // snap back to the last valid page.
   useEffect(() => {
-    if (page !== safePage) setPage(safePage);
-  }, [page, safePage, setPage]);
+    if (result && page > totalPages) setPage(totalPages);
+  }, [result, page, totalPages, setPage]);
 
-  const pageItems = useMemo(
-    () => filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
-    [filtered, safePage],
-  );
-  const rangeStart = filtered.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1;
-  const rangeEnd = Math.min(safePage * PAGE_SIZE, filtered.length);
+  const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const rangeEnd = Math.min(page * PAGE_SIZE, total);
 
   return (
     <Stack>
@@ -157,12 +131,12 @@ export function CallsPage() {
         )} showActions />
         <Footer>
           <span>
-            Showing {rangeStart}–{rangeEnd} of {filtered.length}
+            Showing {rangeStart}–{rangeEnd} of {total}
           </span>
           <PageChips>
-            <PageChip type="button" disabled={safePage <= 1} onClick={() => setPage(safePage - 1)}>←</PageChip>
-            <PageChip type="button" $active>{safePage}</PageChip>
-            <PageChip type="button" disabled={safePage >= totalPages} onClick={() => setPage(safePage + 1)}>→</PageChip>
+            <PageChip type="button" disabled={page <= 1} onClick={() => setPage(page - 1)}>←</PageChip>
+            <PageChip type="button" $active>{page}</PageChip>
+            <PageChip type="button" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>→</PageChip>
           </PageChips>
         </Footer>
       </Card>

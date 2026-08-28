@@ -1,4 +1,5 @@
 import type { CallDetail, CallsFilter, CallSummary, RecurringGroupDetail } from "@/types/call";
+import type { CallsFilterValue } from "./callsFilterStore";
 import type { BackendCallDetail, BackendCallListItem, BackendCallListResponse, BackendGroupedCallListResponse,
   BackendRecurringGroupDetail } from "./backendTypes";
 import { getJson } from "./apiClient";
@@ -56,20 +57,41 @@ export async function listCalls(filter?: CallsFilter, options: {
   return filter ? calls.filter((call) => matchesFilter(call, filter)) : calls;
 }
 
-/** Backend caps page_size at 100, so a full listing pages through in chunks up to `cap`. */
-export async function listAllCalls(cap = 500): Promise<CallSummary[]> {
-  const pageSize = 100;
-  const all: CallSummary[] = [];
-  let page = 1;
-  for (;;) {
-    const batch = await listCalls(undefined, { pageSize, page });
-    all.push(...batch);
-    const reachedCap = all.length >= cap;
-    const isLastPage = batch.length < pageSize;
-    if (reachedCap || isLastPage) break;
-    page += 1;
-  }
-  return all;
+const STATUS_FILTER_PARAM: Record<CallsFilterValue, string | undefined> = {
+  "All": undefined,
+  "Resolved": "resolved",
+  "Improve quality": "improve_quality",
+  "Recurring": "recurring",
+  "Requires review": "attention",
+  "Unresolved": "unresolved",
+  "Analysis failed": "analysis_failed",
+  "Dropped": "dropped",
+  "Rude": "rude",
+};
+
+export interface CallsPageResult {
+  items: CallSummary[];
+  pagination: { page: number; page_size: number; total: number; total_pages: number };
+}
+
+/** Backend-paginated + backend-filtered listing for the Calls page — status
+ * filtering and page slicing both happen in SQL, not by fetching everything
+ * and slicing client-side. */
+export async function listCallsPage(filter: CallsFilterValue, page: number, pageSize: number): Promise<CallsPageResult> {
+  const params = new URLSearchParams({ page: String(page), page_size: String(pageSize) });
+  const statusFilter = STATUS_FILTER_PARAM[filter];
+  if (statusFilter) params.set("status_filter", statusFilter);
+  const response = await getJson<BackendGroupedCallListResponse>(`/api/v1/calls-grouped?${params}`);
+  const items = await Promise.all(response.items.map(async (item) => {
+    if (item.item_type === "RECURRING_GROUP") return mapRecurringGroupListItem(item);
+    try {
+      const detail = await getJson<BackendCallDetail>(`/api/v1/calls/${encodeURIComponent(item.id)}`);
+      return mapCallDetail(detail);
+    } catch {
+      return mapCallListItem(item);
+    }
+  }));
+  return { items, pagination: response.pagination };
 }
 
 /** Agent-scoped call list for the Conversation quality card's "Recent calls" — uses the plain (non-grouped)
