@@ -1,10 +1,13 @@
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card } from "@/components/primitives/Card";
 import { StatusPill } from "@/components/status/StatusPill";
+import { Avatar } from "@/components/primitives/Avatar";
+import { Pill } from "@/components/primitives/Pill";
 import { useAsync } from "@/hooks/useAsync";
 import { getRecurringGroupDetail } from "@/services/callsService";
 import { formatDurationShort } from "@/utils/formatters";
+import { initialsFromName } from "@/utils/identity";
 
 const Stack = styled.div`
   display: flex;
@@ -42,15 +45,34 @@ const Eyebrow = styled.div`
 `;
 
 const Title = styled.h1`
-  margin: 4px 0 6px;
+  margin: 4px 0 10px;
   font-size: 24px;
   letter-spacing: -0.035em;
 `;
 
-const Meta = styled.div`
-  color: ${({ theme }) => theme.colors.text.muted};
-  font-size: 13px;
+const CustomerRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const CustomerName = styled.div`
+  font-size: 14.5px;
+  font-weight: 800;
+  color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+const CustomerRef = styled.div`
+  font-size: 11.5px;
   font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.faint};
+`;
+
+const MetaPills = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
 `;
 
 const ReviewGrid = styled.div`
@@ -73,6 +95,16 @@ const Body = styled.div`
   font-size: 14px;
   font-weight: 600;
   line-height: 1.65;
+`;
+
+// The card behind this has an accent gradient background, so its own text
+// needs to be white — Label/Body are shared with the plain "Recommended
+// agent action" card next to it, so the override is scoped here rather
+// than changed on the shared components.
+const SummaryCard = styled(Card)`
+  ${Label}, ${Body} {
+    color: ${({ theme }) => theme.colors.text.onAccent};
+  }
 `;
 
 const Timeline = styled.div`
@@ -110,10 +142,11 @@ const Line = styled.div`
   background: ${({ theme }) => theme.colors.line.input};
 `;
 
-const CallCard = styled(Card)`
+const CallCard = styled(Card)<{ $isRecurring: boolean }>`
   cursor: pointer;
   margin-bottom: 18px;
-  transition: transform 0.15s ease;
+  transition: transform 0.15s ease, background 0.15s ease;
+  ${({ $isRecurring, theme }) => $isRecurring && `background: ${theme.colors.tone.critical.chipBg};`}
 
   &:hover { transform: translateY(-1px); }
 `;
@@ -156,6 +189,7 @@ const Verdict = styled.div`
 export function RecurringGroupDetailPage() {
   const { groupId } = useParams();
   const navigate = useNavigate();
+  const theme = useTheme();
   const { data: group, loading } = useAsync(() => getRecurringGroupDetail(groupId!), [groupId]);
 
   if (loading || !group) return <Stack>Loading…</Stack>;
@@ -168,19 +202,31 @@ export function RecurringGroupDetailPage() {
           <div>
             <Eyebrow>AI-confirmed recurring issue</Eyebrow>
             <Title>{group.title}</Title>
-            <Meta>{group.customerName} {group.customerRef} · {group.calls.length} calls in {group.lookbackDays} days · {group.issueLabel}</Meta>
+            <CustomerRow>
+              <Avatar initials={initialsFromName(group.customerName, group.customerRef)} size={34} fontSize={12} />
+              <div>
+                <CustomerName>{group.customerName}</CustomerName>
+                <CustomerRef>{group.customerRef}</CustomerRef>
+              </div>
+            </CustomerRow>
+            <MetaPills>
+              <Pill $bg={theme.colors.chip.neutral.bg} $fg={theme.colors.chip.neutral.fg}>
+                {group.calls.length} calls in {group.lookbackDays} days
+              </Pill>
+              <Pill $bg={theme.colors.chip.neutral.bg} $fg={theme.colors.chip.neutral.fg}>{group.issueLabel}</Pill>
+            </MetaPills>
           </div>
           <StatusPill status={group.status} />
         </Header>
       </div>
 
       <ReviewGrid>
-        <Card padding="content" accent>
+        <SummaryCard padding="content" accent>
           <Label>Combined summary</Label>
           <Body>{group.summary}</Body>
           <Label style={{ marginTop: 18 }}>Verdict</Label>
           <Body>{group.verdict}</Body>
-        </Card>
+        </SummaryCard>
         <Card padding="content">
           <Label>Recommended agent action</Label>
           <Body>{group.recommendedAction}</Body>
@@ -196,7 +242,7 @@ export function RecurringGroupDetailPage() {
                 <Dot>{call.sequenceNumber}</Dot>
                 {index < group.calls.length - 1 && <Line />}
               </Rail>
-              <CallCard padding="content" onClick={() => navigate(`/calls/${call.id}`)}>
+              <CallCard padding="content" $isRecurring={call.status === "recurring"} onClick={() => navigate(`/calls/${call.id}`)}>
                 <CallHead>
                   <div>
                     <CallTitle>Call {call.sequenceNumber} — {call.title}</CallTitle>
