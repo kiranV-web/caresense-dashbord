@@ -32,6 +32,12 @@ function chromeFor(pathname: string): PageChrome {
   if (pathname.startsWith("/calls/")) {
     return { title: "Calls", subtitle: "Call detail", sidebarKey: "calls" };
   }
+  if (pathname === "/customers") {
+    return { title: "Customers", subtitle: "Call history by customer", sidebarKey: "customers" };
+  }
+  if (pathname.startsWith("/customers/")) {
+    return { title: "Customers", subtitle: "Customer call history", sidebarKey: "customers" };
+  }
   if (pathname === "/settings") {
     return { title: "Settings", subtitle: "Call analysis rules", sidebarKey: "settings" };
   }

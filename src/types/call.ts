@@ -2,6 +2,20 @@ import type { Id, IsoDateString, ToneKey } from "./common";
 
 export type CallStatus = "resolved" | "resolved_but_improve_quality" | "recurring" | "recurrence-resolved" | "unresolved" | "dropped" | "requires-review" | "analysis-failed";
 
+export interface ManagerAttention {
+  score: number;
+  urgencyLabel: string;
+  primaryReason: string;
+  additionalReasons: string[];
+  factors: Array<{ label: string; value: number; kind: "BASE" | "ADDITION" }>;
+  calculatedAt: string;
+  waitingHours: number;
+  rank?: number;
+  totalAttentionCalls?: number;
+  previousCallId?: string;
+  nextCallId?: string;
+}
+
 export interface CustomerProblem {
   summary: string;
   category: string;
@@ -49,6 +63,7 @@ export interface CallSummary {
   /** Raw manager-attention flag, independent of `status` — a call can need
    * attention while its status pill shows something else (e.g. Dropped). */
   needsManagerAttention: boolean;
+  managerAttention?: ManagerAttention;
   /** Backend call_statuses includes RUDE — the analysis pipeline forces
    * empathy to fail on these, so this is a reliable signal independent of
    * per-segment tone. Always false for recurring-group items. */

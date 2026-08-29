@@ -15,12 +15,19 @@ const Chip = styled.span`
   border-radius: 12px;
 `;
 
+const Cta = styled.div`
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 800;
+`;
+
 export function GradientCtaVisual({ chips }: Readonly<{ chips: string[] }>) {
   return (
     <ChipsRow>
       {chips.map((chip) => (
         <Chip key={chip}>{chip}</Chip>
       ))}
+      <Cta>Review queue →</Cta>
     </ChipsRow>
   );
 }

@@ -7,6 +7,7 @@ import { EtiquetteDotsCompact } from "@/components/etiquette/EtiquetteDotsCompac
 import type { CallSummary } from "@/types/call";
 import { formatDurationShort } from "@/utils/formatters";
 import { labelForCallStatus, toneForCallStatus } from "@/utils/tone";
+import { ManagerAttentionScore } from "@/components/attention/ManagerAttentionScore";
 
 export type CallRowDensity = "comfortable" | "compact";
 
@@ -75,6 +76,42 @@ const CustomerText = styled.div`
     overflow: hidden;
     text-overflow: ellipsis;
   }
+`;
+
+const RankBadge = styled.div`
+  width: 38px;
+  height: 38px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: ${({ theme }) => theme.radii.panel};
+  background: ${({ theme }) => theme.colors.chip.redSoft};
+  color: ${({ theme }) => theme.colors.chip.red.fg};
+  font-size: 12px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+`;
+
+const PrimaryReason = styled.div`
+  margin-top: 2px;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: ${({ theme }) => theme.colors.chip.red.fg};
+`;
+
+const AttentionFlags = styled.div`
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+`;
+
+const AttentionFlag = styled.span`
+  padding: 4px 7px;
+  border-radius: ${({ theme }) => theme.radii.full};
+  background: ${({ theme }) => theme.colors.surface.muted};
+  color: ${({ theme }) => theme.colors.text.secondary};
+  font-size: 9.5px;
+  font-weight: 750;
 `;
 
 const Duration = styled.div`
@@ -170,12 +207,17 @@ export function CallRow({ call, onOpen, density = "comfortable", showActions = f
       }}
     >
       <CustomerCell>
-        <Avatar initials={call.avatarInitials} tintIndex={call.avatarTintIndex} />
+        {call.managerAttention?.rank
+          ? <RankBadge>#{call.managerAttention.rank}</RankBadge>
+          : <Avatar initials={call.avatarInitials} tintIndex={call.avatarTintIndex} />}
         <CustomerText>
           <strong>{call.title}</strong>
+          {call.managerAttention && <PrimaryReason>{call.managerAttention.primaryReason}</PrimaryReason>}
           <small>
-            {call.kind === "recurring-group" && call.callCount ? `${call.callCount} calls · ` : ""}
-            {call.agentName} · {call.customerName} {call.customerRef}
+            {call.managerAttention
+              ? `Agent: ${call.agentName} · Waiting ${call.managerAttention.waitingHours}h${call.managerAttention.additionalReasons.includes("SLA overdue") ? " · SLA overdue" : ""}`
+              : <>{call.kind === "recurring-group" && call.callCount ? `${call.callCount} calls · ` : ""}
+                {call.agentName} · {call.customerName} {call.customerRef}</>}
           </small>
         </CustomerText>
       </CustomerCell>
@@ -198,10 +240,18 @@ export function CallRow({ call, onOpen, density = "comfortable", showActions = f
 
       <Duration>{formatDurationShort(call.durationSeconds)}</Duration>
 
-      <EtiquetteDotsCompact rules={call.etiquette} />
+      {call.managerAttention ? (
+        <AttentionFlags>
+          {call.managerAttention.additionalReasons.length > 0
+            ? call.managerAttention.additionalReasons.map((reason) => <AttentionFlag key={reason}>{reason}</AttentionFlag>)
+            : <AttentionFlag>No additional flags</AttentionFlag>}
+        </AttentionFlags>
+      ) : <EtiquetteDotsCompact rules={call.etiquette} />}
 
       <div style={{ justifySelf: "start" }}>
-        <StatusPill status={call.status} />
+        {call.managerAttention
+          ? <ManagerAttentionScore score={call.managerAttention.score} label={call.managerAttention.urgencyLabel} size="standard" />
+          : <StatusPill status={call.status} />}
       </div>
 
       {showActions && call.kind !== "recurring-group" && (

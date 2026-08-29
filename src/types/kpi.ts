@@ -1,4 +1,5 @@
 import type { CallSummary } from "./call";
+import type { ManagerAttention } from "./call";
 import type { ToneKey } from "./common";
 
 export interface TotalCallsKpi {
@@ -29,6 +30,7 @@ export interface ResolvedKpi {
 export interface AttentionKpi {
   count: number;
   chips: string[];
+  highest?: ManagerAttention;
 }
 
 export interface IssueRanking {

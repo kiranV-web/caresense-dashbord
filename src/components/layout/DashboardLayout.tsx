@@ -7,6 +7,7 @@ const sidebarRoutes: Record<SidebarKey, string> = {
   home: "/",
   team: "/team",
   calls: "/calls",
+  customers: "/customers",
   settings: "/settings",
 };
 

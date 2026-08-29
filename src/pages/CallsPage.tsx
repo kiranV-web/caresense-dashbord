@@ -111,11 +111,11 @@ export function CallsPage() {
 
       <Card padding="none" style={{ padding: "16px 26px 24px" }}>
         <TableHead>
-          <span>Customer / summary</span>
+          <span>{filter === "Requires attention" ? "Rank / call" : "Customer / summary"}</span>
           <span>Sentiment waveform</span>
           <span>Time</span>
-          <span>Etiquette</span>
-          <span>Status</span>
+          <span>{filter === "Requires attention" ? "Additional flags" : "Etiquette"}</span>
+          <span>{filter === "Requires attention" ? "Attention score" : "Status"}</span>
           <span />
         </TableHead>
         <CallList calls={pageItems} onOpen={(call) => navigate(

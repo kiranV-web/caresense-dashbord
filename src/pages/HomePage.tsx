@@ -9,6 +9,7 @@ import { GradientCtaVisual } from "@/components/kpi/visuals/GradientCtaVisual";
 import { ConversationQualityRadar } from "@/components/chart/ConversationQualityRadar";
 import { SegmentedControl } from "@/components/primitives/SegmentedControl";
 import { CallList } from "@/components/call/CallList";
+import { ManagerAttentionScore } from "@/components/attention/ManagerAttentionScore";
 import { IconButton } from "@/components/primitives/IconButton";
 import { useAsync } from "@/hooks/useAsync";
 import { getHomeSummary, getTeamCoachingInsight } from "@/services/homeService";
@@ -412,7 +413,17 @@ export function HomePage() {
           contextLabel={summary.resolved.deltaLabel}
           visual={<MiniBarChart entries={summary.resolved.breakdown} />}
         />
-        <KpiCard value={summary.attention.count} label="Requires attention" accent onClick={openAttentionCalls}>
+        <KpiCard
+          value={summary.attention.count}
+          label="Requires attention"
+          contextLabel={summary.attention.highest ? <>Highest urgency: <ManagerAttentionScore
+            score={summary.attention.highest.score}
+            label={summary.attention.highest.urgencyLabel}
+            size="compact"
+          /></> : "No active attention calls"}
+          accent
+          onClick={openAttentionCalls}
+        >
           <GradientCtaVisual chips={summary.attention.chips} />
         </KpiCard>
       </KpiGrid>

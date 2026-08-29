@@ -34,6 +34,14 @@ export function toneForCallStatus(status: CallStatus): ToneKey {
   }
 }
 
+export function toneForAttentionScore(score: number): ToneKey {
+  if (score >= 90) return "critical";
+  if (score >= 75) return "attention";
+  if (score >= 60) return "caution";
+  if (score >= 45) return "neutral";
+  return "mild";
+}
+
 export function toneForRuleStatus(status: EtiquetteRuleStatus): ToneKey {
   switch (status) {
     case "pass":

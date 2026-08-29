@@ -11,6 +11,20 @@ export type BackendTextualTone =
   | "NEUTRAL" | "CALM" | "PLEASANT" | "IRRITATED"
   | "ANGRY" | "RUDE" | "HAPPY" | "SATISFIED" | "DISTRESSED" | "UNKNOWN";
 
+export interface BackendManagerAttention {
+  score: number;
+  urgency_label: string;
+  primary_reason: string;
+  additional_reasons: string[];
+  factors: Array<{ label: string; value: number; kind: "BASE" | "ADDITION" }>;
+  calculated_at: string;
+  waiting_hours: number;
+  rank?: number;
+  total_attention_calls?: number;
+  previous_call_id?: string | null;
+  next_call_id?: string | null;
+}
+
 export interface BackendCallListItem {
   id: string;
   external_call_id: string;
@@ -27,6 +41,7 @@ export interface BackendCallListItem {
   call_statuses: BackendCallStatus[];
   needs_manager_attention: boolean;
   urgency_level: BackendUrgencyLevel;
+  manager_attention?: BackendManagerAttention | null;
   processing_state: string;
   transcription_status?: string;
   analysis_status?: string;
@@ -46,6 +61,37 @@ export interface BackendCustomerProblem {
 }
 
 export interface BackendCallListResponse {
+  items: BackendCallListItem[];
+  pagination: { page: number; page_size: number; total: number; total_pages: number };
+}
+
+export interface BackendAttentionSummary {
+  total: number;
+  highest: BackendManagerAttention | null;
+  categories: { rude: number; recurring_unresolved: number; unresolved: number; quality_reviews: number; other: number };
+}
+
+export interface BackendCustomerSummary {
+  id: string;
+  external_id: string;
+  logged_names: string[];
+  call_count: number;
+  resolved_count: number;
+  improve_quality_count: number;
+  attention_count: number;
+  dropped_count: number;
+  total_duration_seconds: string | number;
+  latest_call_at: string | null;
+  activity: BackendTeamActivityCall[];
+}
+
+export interface BackendCustomerListResponse {
+  items: BackendCustomerSummary[];
+  pagination: { page: number; page_size: number; total: number; total_pages: number };
+}
+
+export interface BackendCustomerDetailResponse {
+  customer: Omit<BackendCustomerSummary, "activity">;
   items: BackendCallListItem[];
   pagination: { page: number; page_size: number; total: number; total_pages: number };
 }

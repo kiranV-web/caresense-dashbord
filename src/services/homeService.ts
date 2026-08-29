@@ -1,5 +1,5 @@
 import type { HomeSummary, IssueRanking } from "@/types/kpi";
-import type { BackendCallListItem, BackendCallListResponse } from "./backendTypes";
+import type { BackendAttentionSummary, BackendCallListItem, BackendCallListResponse } from "./backendTypes";
 import { getJson } from "./apiClient";
 import { listCalls } from "./callsService";
 import { formatDurationLong } from "@/utils/formatters";
@@ -67,22 +67,15 @@ export async function getTeamCoachingInsight(): Promise<string> {
 }
 
 export async function getHomeSummary(): Promise<HomeSummary> {
-  const items = await fetchAllCalls();
+  const [items, attentionSummary] = await Promise.all([
+    fetchAllCalls(), getJson<BackendAttentionSummary>("/api/v1/manager-attention/summary"),
+  ]);
 
   const resolved = items.filter((item) =>
     item.resolution_status === "RESOLVED" || item.resolution_status === "RESOLVED_BUT_IMPROVE_QUALITY").length;
   const resolvedOnly = items.filter((item) => item.resolution_status === "RESOLVED").length;
   const improveQuality = items.filter((item) => item.resolution_status === "RESOLVED_BUT_IMPROVE_QUALITY").length;
-  const attentionItems = items.filter((item) => item.analysis_status !== "FAILED" && (
-    item.call_statuses.includes("RECURRING")
-    || item.call_statuses.includes("RUDE")
-    || item.resolution_status === "UNRESOLVED"
-  ));
-  const recurring = attentionItems.filter((item) => item.call_statuses.includes("RECURRING")).length;
-  const rude = attentionItems.filter((item) => item.call_statuses.includes("RUDE")).length;
-  const unresolved = attentionItems.filter((item) => item.resolution_status === "UNRESOLVED").length;
-  const attentionCount = attentionItems.length;
-
+  const rude = items.filter((item) => item.call_statuses.includes("RUDE")).length;
   const durations = items.map((item) => Number(item.duration_seconds)).filter((value) => Number.isFinite(value) && value > 0);
   const avgSeconds = durations.length ? durations.reduce((sum, value) => sum + value, 0) / durations.length : null;
 
@@ -104,8 +97,25 @@ export async function getHomeSummary(): Promise<HomeSummary> {
       ],
     },
     attention: {
-      count: attentionCount,
-      chips: [`${recurring} recurring`, `${rude} rude`, `${unresolved} unresolved`],
+      count: attentionSummary.total,
+      highest: attentionSummary.highest ? {
+        score: attentionSummary.highest.score,
+        urgencyLabel: attentionSummary.highest.urgency_label,
+        primaryReason: attentionSummary.highest.primary_reason,
+        additionalReasons: attentionSummary.highest.additional_reasons,
+        factors: attentionSummary.highest.factors,
+        calculatedAt: attentionSummary.highest.calculated_at,
+        waitingHours: attentionSummary.highest.waiting_hours,
+        rank: attentionSummary.highest.rank,
+        totalAttentionCalls: attentionSummary.highest.total_attention_calls,
+      } : undefined,
+      chips: [
+        `${attentionSummary.categories.rude} rude`,
+        `${attentionSummary.categories.recurring_unresolved} recurring unresolved`,
+        `${attentionSummary.categories.unresolved} unresolved`,
+        `${attentionSummary.categories.quality_reviews} quality reviews`,
+        ...(attentionSummary.categories.other ? [`${attentionSummary.categories.other} other`] : []),
+      ],
     },
     issuesByEnquiry: rankFromItems(items, "issue_category", "General enquiry"),
     callsList: await listCalls(undefined, { pageSize: HOME_CALLS_PREVIEW_COUNT }),

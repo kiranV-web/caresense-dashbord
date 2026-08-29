@@ -10,6 +10,7 @@ import { getCallDetail } from "@/services/callsService";
 import { formatDurationShort } from "@/utils/formatters";
 import type { RecurringOccurrence, TranscriptLine as TranscriptLineData } from "@/types/call";
 import { SHOW_TRANSCRIPT_TONE } from "@/config";
+import { ManagerAttentionScore } from "@/components/attention/ManagerAttentionScore";
 
 const Stack = styled.div`
   display: flex;
@@ -50,6 +51,94 @@ const Meta = styled.div`
   font-size: 12.5px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.muted};
+`;
+
+const HeaderStatus = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const AttentionCard = styled(Card)`
+  border-left: 5px solid ${({ theme }) => theme.colors.chip.red.fg};
+  background: linear-gradient(145deg, ${({ theme }) => theme.colors.surface.card} 20%,
+    ${({ theme }) => theme.colors.chip.redSoft} 145%);
+`;
+
+const AttentionOverview = styled.div`
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 22px;
+  align-items: center;
+`;
+
+const ReasonList = styled.div`
+  font-size: 12.5px;
+  line-height: 1.75;
+  color: ${({ theme }) => theme.colors.text.secondary};
+
+  strong { color: ${({ theme }) => theme.colors.text.primary}; }
+`;
+
+const RankText = styled.div`
+  text-align: right;
+  font-size: 12px;
+  font-weight: 750;
+  color: ${({ theme }) => theme.colors.text.muted};
+`;
+
+const ScoreExplanation = styled.details`
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid ${({ theme }) => theme.colors.line.input};
+
+  summary {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 800;
+  }
+`;
+
+const Factors = styled.div`
+  margin-top: 13px;
+  max-width: 620px;
+`;
+
+const Factor = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 7px 0;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.line.hairline};
+  font-size: 12.5px;
+  color: ${({ theme }) => theme.colors.text.secondary};
+
+  span:last-child { font-weight: 800; font-variant-numeric: tabular-nums; }
+`;
+
+const CalculatedAt = styled.div`
+  margin-top: 10px;
+  font-size: 10.5px;
+  color: ${({ theme }) => theme.colors.text.faintAlt};
+`;
+
+const QueueNavigation = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+  margin-top: 14px;
+`;
+
+const QueueButton = styled.button`
+  padding: 7px 11px;
+  border-radius: ${({ theme }) => theme.radii.pillSm};
+  background: ${({ theme }) => theme.colors.surface.card};
+  border: 1px solid ${({ theme }) => theme.colors.line.input};
+  color: ${({ theme }) => theme.colors.text.secondary};
+  font-size: 11.5px;
+  font-weight: 750;
+
+  &:disabled { opacity: 0.4; }
 `;
 
 const Columns = styled.div`
@@ -320,8 +409,54 @@ export function CallDetailPage() {
             Customer {call.customerRef} · Agent {call.agentName} · {formatDurationShort(call.durationSeconds)} · Call {call.callNumber}
           </Meta>
         </TitleBlock>
-        <StatusPill status={call.status} />
+        <HeaderStatus>
+          {call.managerAttention && <ManagerAttentionScore
+            score={call.managerAttention.score}
+            label={call.managerAttention.urgencyLabel}
+            size="prominent"
+          />}
+          <StatusPill status={call.status} />
+        </HeaderStatus>
       </HeaderCard>
+
+      {call.managerAttention && (
+        <AttentionCard padding="content">
+          <AttentionOverview>
+            <ReasonList>
+              <div><strong>Primary reason:</strong> {call.managerAttention.primaryReason}</div>
+              <div><strong>Additional reasons:</strong> {call.managerAttention.additionalReasons.join(", ") || "None"}</div>
+            </ReasonList>
+            <RankText>
+              Ranked #{call.managerAttention.rank} of {call.managerAttention.totalAttentionCalls} attention calls
+            </RankText>
+          </AttentionOverview>
+          <ScoreExplanation>
+            <summary>Why this score?</summary>
+            <Factors>
+              {call.managerAttention.factors.map((factor) => (
+                <Factor key={`${factor.label}-${factor.value}`}>
+                  <span>{factor.label}</span>
+                  <span>{factor.kind === "ADDITION" ? "+" : ""}{factor.value}</span>
+                </Factor>
+              ))}
+              <Factor><strong>Final manager-attention score</strong><span>{call.managerAttention.score}</span></Factor>
+            </Factors>
+            <CalculatedAt>Last calculated {new Date(call.managerAttention.calculatedAt).toLocaleString()}</CalculatedAt>
+          </ScoreExplanation>
+          <QueueNavigation>
+            <QueueButton
+              type="button"
+              disabled={!call.managerAttention.previousCallId}
+              onClick={() => call.managerAttention?.previousCallId && navigate(`/calls/${call.managerAttention.previousCallId}`)}
+            >← Previous attention call</QueueButton>
+            <QueueButton
+              type="button"
+              disabled={!call.managerAttention.nextCallId}
+              onClick={() => call.managerAttention?.nextCallId && navigate(`/calls/${call.managerAttention.nextCallId}`)}
+            >Next attention call →</QueueButton>
+          </QueueNavigation>
+        </AttentionCard>
+      )}
 
       <Columns>
         <ColStack>

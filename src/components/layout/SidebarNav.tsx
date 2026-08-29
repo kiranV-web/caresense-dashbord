@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import { Home, Users, Phone, Settings, LogOut } from "lucide-react";
+import { Home, Users, Phone, ContactRound, Settings, LogOut } from "lucide-react";
 
-export type SidebarKey = "home" | "team" | "calls" | "settings";
+export type SidebarKey = "home" | "customers" | "team" | "calls" | "settings";
 
 export interface SidebarNavProps {
   activeKey: SidebarKey;
@@ -11,6 +11,7 @@ export interface SidebarNavProps {
 const navItems: { key: SidebarKey; label: string; Icon: typeof Home }[] = [
   { key: "home", label: "Home", Icon: Home },
   { key: "calls", label: "Calls", Icon: Phone },
+  { key: "customers", label: "Customers", Icon: ContactRound },
   { key: "team", label: "Team", Icon: Users },
 ];
 
