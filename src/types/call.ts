@@ -134,6 +134,10 @@ export interface CallDetail extends CallSummary {
     countLabel: string;
     occurrences: RecurringOccurrence[];
   };
+  /** Set when processing stopped before analysis could run (transcription,
+   * analysis or recurrence-linking failure) — the raw "<CODE>: <detail>"
+   * reason recorded by whichever stage failed. */
+  failureReason?: string;
 }
 
 export interface CallsFilter {

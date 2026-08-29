@@ -84,6 +84,13 @@ const TranscriptList = styled.div`
   gap: 14px;
 `;
 
+const TranscriptEmpty = styled.div`
+  color: ${({ theme }) => theme.colors.text.muted};
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 0;
+`;
+
 const TranscriptRow = styled.div`
   display: grid;
   grid-template-columns: 46px 1fr;
@@ -178,6 +185,25 @@ const ProblemValue = styled.div`
   font-size: 13px;
   line-height: 1.45;
   font-weight: 650;
+`;
+
+const FailureCard = styled(Card)`
+  background: ${({ theme }) => theme.colors.chip.redSoft};
+`;
+
+const FailureHeading = styled.div`
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: ${({ theme }) => theme.colors.chip.red.fg};
+`;
+
+const FailureBody = styled.div`
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  margin-top: 10px;
+  font-weight: 500;
 `;
 
 const SummaryBody = styled.div`
@@ -308,28 +334,41 @@ export function CallDetailPage() {
               <CardTitle>Transcript</CardTitle>
             </TranscriptHead>
             <TranscriptList>
-              {call.transcript.map((line) => (
-                <TranscriptLine key={line.timestampLabel + line.text} line={line} />
-              ))}
+              {call.transcript.length === 0 ? (
+                <TranscriptEmpty>
+                  {call.failureReason ? "Transcription did not complete for this call." : "No transcript is available for this call."}
+                </TranscriptEmpty>
+              ) : (
+                call.transcript.map((line) => (
+                  <TranscriptLine key={line.timestampLabel + line.text} line={line} />
+                ))
+              )}
             </TranscriptList>
           </Card>
         </ColStack>
 
         <ColStack>
-          <Card padding="content" accent>
-            <SummaryHeading>AI summary</SummaryHeading>
-            <SummaryBody>{call.aiSummary}</SummaryBody>
-            <VerdictBlock>
-              <VerdictLabel>Verdict</VerdictLabel>
-              <VerdictValue>{call.verdict}</VerdictValue>
-            </VerdictBlock>
-            {call.qualityFeedback && (
+          {call.failureReason ? (
+            <FailureCard padding="content">
+              <FailureHeading>Processing failed</FailureHeading>
+              <FailureBody>{call.failureReason}</FailureBody>
+            </FailureCard>
+          ) : (
+            <Card padding="content" accent>
+              <SummaryHeading>AI summary</SummaryHeading>
+              <SummaryBody>{call.aiSummary}</SummaryBody>
               <VerdictBlock>
-                <VerdictLabel>Quality feedback</VerdictLabel>
-                <VerdictValue>{call.qualityFeedback}</VerdictValue>
+                <VerdictLabel>Verdict</VerdictLabel>
+                <VerdictValue>{call.verdict}</VerdictValue>
               </VerdictBlock>
-            )}
-          </Card>
+              {call.qualityFeedback && (
+                <VerdictBlock>
+                  <VerdictLabel>Quality feedback</VerdictLabel>
+                  <VerdictValue>{call.qualityFeedback}</VerdictValue>
+                </VerdictBlock>
+              )}
+            </Card>
+          )}
 
           {call.etiquetteApplicable && (
             <Card padding="content">

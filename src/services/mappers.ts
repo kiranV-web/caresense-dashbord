@@ -254,7 +254,7 @@ export function mapCallListItem(item: BackendCallListItem): CallSummary {
     customerName: displayName(item.customer_name, "Customer"),
     customerRef: `#${item.customer_external_id}`,
     durationSeconds,
-    status: item.analysis_status === "FAILED" ? "analysis-failed"
+    status: item.processing_state === "FAILED" ? "analysis-failed"
       : callStatusFromBackend(item.resolution_status, item.call_statuses, item.needs_manager_attention),
     needsManagerAttention: item.needs_manager_attention,
     isRude: item.call_statuses.includes("RUDE"),
@@ -357,5 +357,8 @@ export function mapCallDetail(detail: BackendCallDetail): CallDetail {
     } : undefined,
     ruleEvidence: undefined,
     recurringIssue: recurringIssueFromGroups(detail.recurring_groups, detail.id),
+    failureReason: detail.processing_state === "FAILED"
+      ? (detail.transcription_failure_reason || detail.analysis_failure_reason || detail.recurrence_failure_reason || undefined)
+      : undefined,
   };
 }

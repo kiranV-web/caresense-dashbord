@@ -28,7 +28,9 @@ export interface BackendCallListItem {
   needs_manager_attention: boolean;
   urgency_level: BackendUrgencyLevel;
   processing_state: string;
+  transcription_status?: string;
   analysis_status?: string;
+  recurrence_status?: string;
   customer_external_id: string;
   customer_name: string | null;
   agent_id: string;
@@ -164,6 +166,9 @@ export interface BackendCallDetail extends BackendCallListItem {
   rules: BackendRules | null;
   segments: BackendSegment[];
   recurring_groups: BackendRecurringGroup[];
+  transcription_failure_reason?: string | null;
+  analysis_failure_reason?: string | null;
+  recurrence_failure_reason?: string | null;
 }
 
 export interface BackendDashboardHome {

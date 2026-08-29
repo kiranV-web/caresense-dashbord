@@ -172,8 +172,8 @@ export function AudioPlayerWaveform({ call }: Readonly<AudioPlayerWaveformProps>
       </div>
 
       <Ruler>
-        {rulerLabelsFor(callDuration).map((label) => (
-          <span key={label}>{label}</span>
+        {rulerLabelsFor(callDuration).map((label, index) => (
+          <span key={`${label}-${index}`}>{label}</span>
         ))}
       </Ruler>
 
