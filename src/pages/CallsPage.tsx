@@ -13,6 +13,7 @@ const PAGE_SIZE = 15;
 
 const filterItems: { value: CallsFilterValue; label: string }[] = [
   { value: "All", label: "All" },
+  { value: "Requires attention", label: "Requires attention" },
   { value: "Resolved", label: "Resolved" },
   { value: "Recurring", label: "Recurring" },
   { value: "Dropped", label: "Dropped" },

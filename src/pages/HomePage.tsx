@@ -373,7 +373,7 @@ export function HomePage() {
   const selectedRuleLabel = quality?.rules.find((rule) => rule.rule === selectedRule)?.label;
 
   function openAttentionCalls() {
-    setCallsFilter("Requires review");
+    setCallsFilter("Requires attention");
     navigate("/calls");
   }
 

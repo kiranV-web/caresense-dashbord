@@ -6,7 +6,7 @@ import { getJson } from "./apiClient";
 import { mapCallDetail, mapCallListItem, mapRecurringGroupDetail, mapRecurringGroupListItem } from "./mappers";
 
 function matchesFilter(call: CallSummary, filter: CallsFilter): boolean {
-  if (filter.status === "attention" && call.status !== "requires-review") return false;
+  if (filter.status === "attention" && !call.needsManagerAttention) return false;
   if (filter.status && filter.status !== "attention" && call.status !== filter.status) return false;
   if (filter.agentId && call.agentId !== filter.agentId) return false;
   if (filter.search) {
@@ -62,7 +62,7 @@ const STATUS_FILTER_PARAM: Record<CallsFilterValue, string | undefined> = {
   "Resolved": "resolved",
   "Improve quality": "improve_quality",
   "Recurring": "recurring",
-  "Requires review": "attention",
+  "Requires attention": "attention",
   "Unresolved": "unresolved",
   "Analysis failed": "analysis_failed",
   "Dropped": "dropped",

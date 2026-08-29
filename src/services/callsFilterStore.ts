@@ -7,7 +7,7 @@ export type CallsFilterValue =
   | "Analysis failed"
   | "Dropped"
   | "Rude"
-  | "Requires review";
+  | "Requires attention";
 
 export interface CallsPageState {
   filter: CallsFilterValue;
@@ -18,7 +18,7 @@ const STORAGE_KEY = "caresense.calls-page-state.v1";
 const DEFAULT_STATE: CallsPageState = { filter: "All", page: 1 };
 const VALID_FILTERS = new Set<CallsFilterValue>([
   "All", "Resolved", "Improve quality", "Recurring", "Unresolved",
-  "Analysis failed", "Dropped", "Rude", "Requires review",
+  "Analysis failed", "Dropped", "Rude", "Requires attention",
 ]);
 
 function loadInitial(): CallsPageState {
@@ -26,10 +26,11 @@ function loadInitial(): CallsPageState {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_STATE;
-    const parsed = JSON.parse(raw) as Partial<CallsPageState>;
-    if (typeof parsed.filter !== "string" || !VALID_FILTERS.has(parsed.filter as CallsFilterValue)) return DEFAULT_STATE;
+    const parsed = JSON.parse(raw) as { filter?: string; page?: number };
+    const storedFilter = parsed.filter === "Requires review" ? "Requires attention" : parsed.filter;
+    if (typeof storedFilter !== "string" || !VALID_FILTERS.has(storedFilter as CallsFilterValue)) return DEFAULT_STATE;
     if (typeof parsed.page !== "number" || parsed.page < 1) return DEFAULT_STATE;
-    return { filter: parsed.filter as CallsFilterValue, page: parsed.page };
+    return { filter: storedFilter as CallsFilterValue, page: parsed.page };
   } catch {
     return DEFAULT_STATE;
   }

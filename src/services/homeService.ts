@@ -73,10 +73,11 @@ export async function getHomeSummary(): Promise<HomeSummary> {
     item.resolution_status === "RESOLVED" || item.resolution_status === "RESOLVED_BUT_IMPROVE_QUALITY").length;
   const resolvedOnly = items.filter((item) => item.resolution_status === "RESOLVED").length;
   const improveQuality = items.filter((item) => item.resolution_status === "RESOLVED_BUT_IMPROVE_QUALITY").length;
-  const recurring = items.filter((item) => item.call_statuses.includes("RECURRING")).length;
-  const rude = items.filter((item) => item.call_statuses.includes("RUDE")).length;
-  const unresolved = items.filter((item) => item.resolution_status === "UNRESOLVED").length;
-  const attentionCount = items.filter((item) => item.needs_manager_attention).length;
+  const attentionItems = items.filter((item) => item.needs_manager_attention);
+  const recurring = attentionItems.filter((item) => item.call_statuses.includes("RECURRING")).length;
+  const rude = attentionItems.filter((item) => item.call_statuses.includes("RUDE")).length;
+  const unresolved = attentionItems.filter((item) => item.resolution_status === "UNRESOLVED").length;
+  const attentionCount = attentionItems.length;
 
   const durations = items.map((item) => Number(item.duration_seconds)).filter((value) => Number.isFinite(value) && value > 0);
   const avgSeconds = durations.length ? durations.reduce((sum, value) => sum + value, 0) / durations.length : null;

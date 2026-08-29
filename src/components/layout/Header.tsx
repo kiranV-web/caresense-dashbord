@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import { SegmentedControl, type SegmentedItem } from "@/components/primitives/SegmentedControl";
 import { LogoMark } from "@/components/brand/LogoMark";
 
@@ -34,8 +35,19 @@ const Identity = styled.div`
 // Centres the mark over the sidebar rail below it — the rail's icons sit
 // centred within its 68px width, but the mark's own width (42px) starts
 // flush at the rail's left edge otherwise, landing ~14px left of that centre.
-const AlignedLogoMark = styled(LogoMark)`
+const LogoButton = styled.button`
   margin-left: 14px;
+  padding: 0;
+  border: none;
+  background: none;
+  display: flex;
+  cursor: pointer;
+  border-radius: 50%;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.interaction.focusRing};
+  }
 `;
 
 const Title = styled.div`
@@ -56,10 +68,13 @@ const End = styled.div`
 `;
 
 export function Header({ title, subtitle, mode, onModeChange }: Readonly<HeaderProps>) {
+  const navigate = useNavigate();
   return (
     <Grid>
       <Identity>
-        <AlignedLogoMark size={42} />
+        <LogoButton type="button" aria-label="Go to home" title="Home" onClick={() => navigate("/")}>
+          <LogoMark size={42} />
+        </LogoButton>
         <div>
           <Title>{title}</Title>
           <Subtitle>{subtitle}</Subtitle>
