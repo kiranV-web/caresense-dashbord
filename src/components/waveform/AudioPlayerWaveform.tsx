@@ -54,13 +54,6 @@ const TimeLabel = styled.div`
   }
 `;
 
-const Meta = styled.div`
-  margin-left: auto;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.text.muted};
-`;
-
 const Ruler = styled.div`
   display: flex;
   justify-content: space-between;
@@ -162,9 +155,6 @@ export function AudioPlayerWaveform({ call }: Readonly<AudioPlayerWaveformProps>
         <TimeLabel>
           {formatDurationShort(playedFraction * callDuration)} <span>/ {formatDurationShort(callDuration)}</span>
         </TimeLabel>
-        <Meta>
-          1.0× · hold {call.holdLabel} · silence {call.silenceLabel}
-        </Meta>
       </PlayerHead>
 
       {/* progressFraction gives a "reveal as it plays" effect — bars ahead

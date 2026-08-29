@@ -134,8 +134,6 @@ export interface CallDetail extends CallSummary {
     countLabel: string;
     occurrences: RecurringOccurrence[];
   };
-  holdLabel: string;
-  silenceLabel: string;
 }
 
 export interface CallsFilter {

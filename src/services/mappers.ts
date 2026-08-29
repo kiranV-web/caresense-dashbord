@@ -357,7 +357,5 @@ export function mapCallDetail(detail: BackendCallDetail): CallDetail {
     } : undefined,
     ruleEvidence: undefined,
     recurringIssue: recurringIssueFromGroups(detail.recurring_groups, detail.id),
-    holdLabel: "—",
-    silenceLabel: "—",
   };
 }

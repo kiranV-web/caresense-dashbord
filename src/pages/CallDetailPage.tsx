@@ -78,12 +78,6 @@ const TranscriptHead = styled.div`
   margin-bottom: 16px;
 `;
 
-const TranscriptHint = styled.div`
-  font-size: 12.5px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.text.muted};
-`;
-
 const TranscriptList = styled.div`
   display: flex;
   flex-direction: column;
@@ -312,7 +306,6 @@ export function CallDetailPage() {
           <Card padding="content">
             <TranscriptHead>
               <CardTitle>Transcript</CardTitle>
-              <TranscriptHint>Search · Copy</TranscriptHint>
             </TranscriptHead>
             <TranscriptList>
               {call.transcript.map((line) => (
@@ -323,18 +316,6 @@ export function CallDetailPage() {
         </ColStack>
 
         <ColStack>
-          {call.customerProblem && (
-            <Card padding="content" accent>
-              <SummaryHeading>Customer’s Problem</SummaryHeading>
-              <ProblemGrid>
-                <ProblemItem><ProblemLabel>Problem</ProblemLabel><ProblemValue>{call.customerProblem.summary}</ProblemValue></ProblemItem>
-                <ProblemItem><ProblemLabel>Category</ProblemLabel><ProblemValue>{call.customerProblem.category}</ProblemValue></ProblemItem>
-                <ProblemItem><ProblemLabel>Requested outcome</ProblemLabel><ProblemValue>{call.customerProblem.requestedOutcome}</ProblemValue></ProblemItem>
-                <ProblemItem><ProblemLabel>Transcript evidence</ProblemLabel><ProblemValue>{call.customerProblem.evidence}</ProblemValue></ProblemItem>
-              </ProblemGrid>
-            </Card>
-          )}
-
           <Card padding="content" accent>
             <SummaryHeading>AI summary</SummaryHeading>
             <SummaryBody>{call.aiSummary}</SummaryBody>
@@ -354,6 +335,18 @@ export function CallDetailPage() {
             <Card padding="content">
               <EtiquetteCardTitle>Call etiquette</EtiquetteCardTitle>
               <EtiquetteRuleList rules={call.etiquette} evidence={call.ruleEvidence} />
+            </Card>
+          )}
+
+          {call.customerProblem && (
+            <Card padding="content" accent>
+              <SummaryHeading>Customer’s Problem</SummaryHeading>
+              <ProblemGrid>
+                <ProblemItem><ProblemLabel>Problem</ProblemLabel><ProblemValue>{call.customerProblem.summary}</ProblemValue></ProblemItem>
+                <ProblemItem><ProblemLabel>Category</ProblemLabel><ProblemValue>{call.customerProblem.category}</ProblemValue></ProblemItem>
+                <ProblemItem><ProblemLabel>Requested outcome</ProblemLabel><ProblemValue>{call.customerProblem.requestedOutcome}</ProblemValue></ProblemItem>
+                <ProblemItem><ProblemLabel>Transcript evidence</ProblemLabel><ProblemValue>{call.customerProblem.evidence}</ProblemValue></ProblemItem>
+              </ProblemGrid>
             </Card>
           )}
 
