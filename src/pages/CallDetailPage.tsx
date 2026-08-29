@@ -390,7 +390,13 @@ function TranscriptLine({ line }: Readonly<{ line: TranscriptLineData }>) {
     <TranscriptRow>
       <TranscriptTime>{line.timestampLabel}</TranscriptTime>
       <Bubble
-        $bg={isAgent ? theme.colors.transcript.agentBubbleBg : theme.colors.transcript.customerBubbleBg}
+        $bg={
+          emotion?.tone === "critical"
+            ? theme.colors.chip.redSoft
+            : isAgent
+              ? theme.colors.transcript.agentBubbleBg
+              : theme.colors.transcript.customerBubbleBg
+        }
         $justify={isAgent ? "start" : "end"}
       >
         <SpeakerRow>
