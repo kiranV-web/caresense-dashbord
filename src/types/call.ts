@@ -4,6 +4,7 @@ export type CallStatus = "resolved" | "resolved_but_improve_quality" | "recurrin
 
 export interface ManagerAttention {
   score: number;
+  rawScore: number;
   urgencyLabel: string;
   primaryReason: string;
   additionalReasons: string[];

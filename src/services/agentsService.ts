@@ -2,8 +2,11 @@ import type { Agent, AgentDetail, HeatmapCell, HeatmapLevel } from "@/types/agen
 import type { AgentConversationQuality } from "@/types/agentQuality";
 import type { BackendAgentConversationQuality, BackendDashboardTeam, BackendTeamActivityCall } from "./backendTypes";
 import { getJson } from "./apiClient";
+import { listCallsForAgent } from "./callsService";
 import { displayName, initialsFromName, seedFromId } from "@/utils/identity";
 import { formatDurationLong } from "@/utils/formatters";
+
+const AGENT_RECENT_CALLS_LIMIT = 30;
 
 function activityLevel(call: BackendTeamActivityCall): HeatmapLevel {
   if (call.needs_manager_attention || call.call_statuses.includes("RECURRING") || call.call_statuses.includes("RUDE")) return "rude";
@@ -93,24 +96,24 @@ export async function getAgentConversationQuality(agentId: string): Promise<Agen
   };
 }
 
-export function getAgent(id: string): Promise<AgentDetail | undefined> {
-  return getTeamOverview().then((team) => {
-    const agent = team.agents.find((item) => item.id === id);
-    if (!agent) return undefined;
-    return {
-      ...agent,
-      role: "",
-      tier: "",
-      kpis: [
-        { label: "Calls today", value: String(agent.callsCount) },
-        { label: "Talk time", value: agent.talkTimeLabel },
-        ...(agent.qualityScorePercent === undefined
-          ? []
-          : [{ label: "Quality score", value: `${agent.qualityScorePercent}%` }]),
-      ],
-      activity: agent.miniActivity,
-      etiquette: [],
-      recentCalls: [],
-    };
-  });
+export async function getAgent(id: string): Promise<AgentDetail | undefined> {
+  const team = await getTeamOverview();
+  const agent = team.agents.find((item) => item.id === id);
+  if (!agent) return undefined;
+  const recentCalls = await listCallsForAgent(id, AGENT_RECENT_CALLS_LIMIT);
+  return {
+    ...agent,
+    role: "",
+    tier: "",
+    kpis: [
+      { label: "Calls today", value: String(agent.callsCount) },
+      { label: "Talk time", value: agent.talkTimeLabel },
+      ...(agent.qualityScorePercent === undefined
+        ? []
+        : [{ label: "Quality score", value: `${agent.qualityScorePercent}%` }]),
+    ],
+    activity: agent.miniActivity,
+    etiquette: [],
+    recentCalls,
+  };
 }

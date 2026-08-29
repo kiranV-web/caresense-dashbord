@@ -8,6 +8,9 @@ export interface CallListProps {
   onOpen: (call: CallSummary) => void;
   density?: CallRowDensity;
   showActions?: boolean;
+  /** Use the wider attention-score column (and drop the trailing action
+   * column) — pass only from a page whose header is laid out to match. */
+  wideScore?: boolean;
   emptyMessage?: string;
 }
 
@@ -24,7 +27,7 @@ const Empty = styled.div`
   color: ${({ theme }) => theme.colors.text.muted};
 `;
 
-export function CallList({ calls, onOpen, density, showActions, emptyMessage = "No calls match this view." }: Readonly<CallListProps>) {
+export function CallList({ calls, onOpen, density, showActions, wideScore, emptyMessage = "No calls match this view." }: Readonly<CallListProps>) {
   if (calls.length === 0) {
     return <Empty>{emptyMessage}</Empty>;
   }
@@ -32,7 +35,7 @@ export function CallList({ calls, onOpen, density, showActions, emptyMessage = "
   return (
     <List>
       {calls.map((call) => (
-        <CallRow key={call.id} call={call} onOpen={onOpen} density={density} showActions={showActions} />
+        <CallRow key={call.id} call={call} onOpen={onOpen} density={density} showActions={showActions} wideScore={wideScore} />
       ))}
       <QualityTooltip />
     </List>

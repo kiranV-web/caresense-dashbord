@@ -10,7 +10,7 @@ import { getCallDetail } from "@/services/callsService";
 import { formatDurationShort } from "@/utils/formatters";
 import type { RecurringOccurrence, TranscriptLine as TranscriptLineData } from "@/types/call";
 import { SHOW_TRANSCRIPT_TONE } from "@/config";
-import { ManagerAttentionScore } from "@/components/attention/ManagerAttentionScore";
+import { toneForAttentionScore } from "@/utils/tone";
 
 const Stack = styled.div`
   display: flex;
@@ -57,88 +57,6 @@ const HeaderStatus = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
-`;
-
-const AttentionCard = styled(Card)`
-  border-left: 5px solid ${({ theme }) => theme.colors.chip.red.fg};
-  background: linear-gradient(145deg, ${({ theme }) => theme.colors.surface.card} 20%,
-    ${({ theme }) => theme.colors.chip.redSoft} 145%);
-`;
-
-const AttentionOverview = styled.div`
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 22px;
-  align-items: center;
-`;
-
-const ReasonList = styled.div`
-  font-size: 12.5px;
-  line-height: 1.75;
-  color: ${({ theme }) => theme.colors.text.secondary};
-
-  strong { color: ${({ theme }) => theme.colors.text.primary}; }
-`;
-
-const RankText = styled.div`
-  text-align: right;
-  font-size: 12px;
-  font-weight: 750;
-  color: ${({ theme }) => theme.colors.text.muted};
-`;
-
-const ScoreExplanation = styled.details`
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid ${({ theme }) => theme.colors.line.input};
-
-  summary {
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 800;
-  }
-`;
-
-const Factors = styled.div`
-  margin-top: 13px;
-  max-width: 620px;
-`;
-
-const Factor = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 7px 0;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.line.hairline};
-  font-size: 12.5px;
-  color: ${({ theme }) => theme.colors.text.secondary};
-
-  span:last-child { font-weight: 800; font-variant-numeric: tabular-nums; }
-`;
-
-const CalculatedAt = styled.div`
-  margin-top: 10px;
-  font-size: 10.5px;
-  color: ${({ theme }) => theme.colors.text.faintAlt};
-`;
-
-const QueueNavigation = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 7px;
-  margin-top: 14px;
-`;
-
-const QueueButton = styled.button`
-  padding: 7px 11px;
-  border-radius: ${({ theme }) => theme.radii.pillSm};
-  background: ${({ theme }) => theme.colors.surface.card};
-  border: 1px solid ${({ theme }) => theme.colors.line.input};
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: 11.5px;
-  font-weight: 750;
-
-  &:disabled { opacity: 0.4; }
 `;
 
 const Columns = styled.div`
@@ -324,11 +242,93 @@ const VerdictValue = styled.div`
   margin-top: 3px;
 `;
 
+const EtiquetteCardHead = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+`;
+
 const EtiquetteCardTitle = styled.div`
   font-size: 16px;
   font-weight: 800;
   letter-spacing: -0.025em;
-  margin-bottom: 14px;
+`;
+
+const ScoreRingWrap = styled.div`
+  position: relative;
+  display: inline-flex;
+
+  &:hover > div:last-child {
+    opacity: 1;
+    visibility: visible;
+  }
+`;
+
+const ScoreRing = styled.div<{ $color: string }>`
+  width: 48px;
+  height: 48px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 3px solid ${({ $color }) => $color};
+  color: ${({ $color }) => $color};
+  font-size: 16px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  cursor: default;
+`;
+
+const ScoreTooltipPanel = styled.div`
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 200;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+  min-width: 240px;
+  padding: 11px 15px;
+  border-radius: 12px;
+  background: ${({ theme }) => theme.colors.qualityStack.fail.tooltipBg};
+  box-shadow: ${({ theme }) => theme.colors.qualityStack.tooltipShadow};
+`;
+
+const ScoreTooltipLabel = styled.div`
+  font-size: 12.5px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.qualityStack.tooltipLabelFg};
+  margin-bottom: 6px;
+`;
+
+const ScoreTooltipRow = styled.div`
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  justify-content: space-between;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: ${({ theme }) => theme.colors.qualityStack.tooltipVerdictFg};
+
+  & + & {
+    margin-top: 3px;
+  }
+`;
+
+const ScoreTooltipValue = styled.span`
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: ${({ theme }) => theme.colors.qualityStack.tooltipLabelFg};
+`;
+
+const ScoreTooltipTotal = styled(ScoreTooltipRow)`
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
 `;
 
 const RecurringHead = styled.div`
@@ -392,6 +392,7 @@ const RecurringDuration = styled.span`
 export function CallDetailPage() {
   const { callId } = useParams();
   const navigate = useNavigate();
+  const theme = useTheme();
   const { data: call, loading } = useAsync(() => getCallDetail(callId!), [callId]);
 
   if (loading || !call) return <Stack>Loading…</Stack>;
@@ -410,53 +411,9 @@ export function CallDetailPage() {
           </Meta>
         </TitleBlock>
         <HeaderStatus>
-          {call.managerAttention && <ManagerAttentionScore
-            score={call.managerAttention.score}
-            label={call.managerAttention.urgencyLabel}
-            size="prominent"
-          />}
           <StatusPill status={call.status} />
         </HeaderStatus>
       </HeaderCard>
-
-      {call.managerAttention && (
-        <AttentionCard padding="content">
-          <AttentionOverview>
-            <ReasonList>
-              <div><strong>Primary reason:</strong> {call.managerAttention.primaryReason}</div>
-              <div><strong>Additional reasons:</strong> {call.managerAttention.additionalReasons.join(", ") || "None"}</div>
-            </ReasonList>
-            <RankText>
-              Ranked #{call.managerAttention.rank} of {call.managerAttention.totalAttentionCalls} attention calls
-            </RankText>
-          </AttentionOverview>
-          <ScoreExplanation>
-            <summary>Why this score?</summary>
-            <Factors>
-              {call.managerAttention.factors.map((factor) => (
-                <Factor key={`${factor.label}-${factor.value}`}>
-                  <span>{factor.label}</span>
-                  <span>{factor.kind === "ADDITION" ? "+" : ""}{factor.value}</span>
-                </Factor>
-              ))}
-              <Factor><strong>Final manager-attention score</strong><span>{call.managerAttention.score}</span></Factor>
-            </Factors>
-            <CalculatedAt>Last calculated {new Date(call.managerAttention.calculatedAt).toLocaleString()}</CalculatedAt>
-          </ScoreExplanation>
-          <QueueNavigation>
-            <QueueButton
-              type="button"
-              disabled={!call.managerAttention.previousCallId}
-              onClick={() => call.managerAttention?.previousCallId && navigate(`/calls/${call.managerAttention.previousCallId}`)}
-            >← Previous attention call</QueueButton>
-            <QueueButton
-              type="button"
-              disabled={!call.managerAttention.nextCallId}
-              onClick={() => call.managerAttention?.nextCallId && navigate(`/calls/${call.managerAttention.nextCallId}`)}
-            >Next attention call →</QueueButton>
-          </QueueNavigation>
-        </AttentionCard>
-      )}
 
       <Columns>
         <ColStack>
@@ -507,7 +464,38 @@ export function CallDetailPage() {
 
           {call.etiquetteApplicable && (
             <Card padding="content">
-              <EtiquetteCardTitle>Call etiquette</EtiquetteCardTitle>
+              <EtiquetteCardHead>
+                <EtiquetteCardTitle>Call etiquette</EtiquetteCardTitle>
+                {call.managerAttention && call.managerAttention.score > 50 && (
+                  <ScoreRingWrap>
+                    <ScoreRing $color={theme.colors.tone[toneForAttentionScore(call.managerAttention.score)].chipFg}>
+                      {call.managerAttention.score}
+                    </ScoreRing>
+                    <ScoreTooltipPanel>
+                      <ScoreTooltipLabel>How this score was calculated</ScoreTooltipLabel>
+                      {call.managerAttention.factors.map((factor) => (
+                        <ScoreTooltipRow key={`${factor.label}-${factor.value}`}>
+                          <span>{factor.label}</span>
+                          <ScoreTooltipValue>{factor.kind === "ADDITION" ? "+" : ""}{factor.value}</ScoreTooltipValue>
+                        </ScoreTooltipRow>
+                      ))}
+                      {call.managerAttention.rawScore > call.managerAttention.score && (
+                        <ScoreTooltipRow>
+                          <span>Raw total</span>
+                          <ScoreTooltipValue>{call.managerAttention.rawScore}</ScoreTooltipValue>
+                        </ScoreTooltipRow>
+                      )}
+                      <ScoreTooltipTotal>
+                        <span>
+                          Manager attention score
+                          {call.managerAttention.rawScore > call.managerAttention.score && " (rounds to 99)"}
+                        </span>
+                        <ScoreTooltipValue>{call.managerAttention.score}</ScoreTooltipValue>
+                      </ScoreTooltipTotal>
+                    </ScoreTooltipPanel>
+                  </ScoreRingWrap>
+                )}
+              </EtiquetteCardHead>
               <EtiquetteRuleList rules={call.etiquette} evidence={call.ruleEvidence} />
             </Card>
           )}

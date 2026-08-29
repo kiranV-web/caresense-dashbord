@@ -4,7 +4,7 @@ import { Card } from "@/components/primitives/Card";
 import { Avatar } from "@/components/primitives/Avatar";
 import { ActivityHeatmap } from "@/components/heatmap/ActivityHeatmap";
 import { EtiquettePercentBars } from "@/components/etiquette/EtiquettePercentBars";
-import { CallList } from "@/components/call/CallList";
+import { CallTable } from "@/components/call/CallTable";
 import { useAsync } from "@/hooks/useAsync";
 import { getAgent } from "@/services/agentsService";
 
@@ -153,7 +153,7 @@ export function AgentDetailPage() {
 
       <Card padding="content">
         <CardTitle>Recent calls</CardTitle>
-        <CallList calls={agent.recentCalls} onOpen={(call) => navigate(`/calls/${call.id}`)} />
+        <CallTable calls={agent.recentCalls} onOpen={(call) => navigate(`/calls/${call.id}`)} />
       </Card>
     </Stack>
   );

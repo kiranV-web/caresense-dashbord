@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/primitives/Card";
 import { SegmentedControl } from "@/components/primitives/SegmentedControl";
-import { CallList } from "@/components/call/CallList";
+import { CallTable } from "@/components/call/CallTable";
 import { useAsync } from "@/hooks/useAsync";
 import { useCallsPageState } from "@/hooks/useCallsPageState";
 import { listCallsPage } from "@/services/callsService";
@@ -31,18 +31,6 @@ const FilterBar = styled.div`
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-`;
-
-const TableHead = styled.div`
-  display: grid;
-  grid-template-columns: 1.5fr 2.6fr 52px 168px 138px 60px;
-  gap: 18px;
-  padding: 10px 12px;
-  font-size: 10.5px;
-  color: ${({ theme }) => theme.colors.text.faintAlt};
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 `;
 
 const Footer = styled.div`
@@ -102,6 +90,7 @@ export function CallsPage() {
 
   const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(page * PAGE_SIZE, total);
+  const isAttentionView = filter === "Requires attention";
 
   return (
     <Stack>
@@ -110,17 +99,11 @@ export function CallsPage() {
       </FilterBar>
 
       <Card padding="none" style={{ padding: "16px 26px 24px" }}>
-        <TableHead>
-          <span>{filter === "Requires attention" ? "Rank / call" : "Customer / summary"}</span>
-          <span>Sentiment waveform</span>
-          <span>Time</span>
-          <span>{filter === "Requires attention" ? "Additional flags" : "Etiquette"}</span>
-          <span>{filter === "Requires attention" ? "Attention score" : "Status"}</span>
-          <span />
-        </TableHead>
-        <CallList calls={pageItems} onOpen={(call) => navigate(
-          call.kind === "recurring-group" ? `/recurring-groups/${call.id}` : `/calls/${call.id}`
-        )} showActions />
+        <CallTable
+          calls={pageItems}
+          onOpen={(call) => navigate(call.kind === "recurring-group" ? `/recurring-groups/${call.id}` : `/calls/${call.id}`)}
+          wideScore={isAttentionView}
+        />
         <Footer>
           <span>
             Showing {rangeStart}–{rangeEnd} of {total}

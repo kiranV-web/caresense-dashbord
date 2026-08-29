@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Download, ChevronRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Avatar } from "@/components/primitives/Avatar";
 import { StatusPill } from "@/components/status/StatusPill";
 import { SentimentWaveform } from "@/components/waveform/SentimentWaveform";
@@ -7,7 +7,7 @@ import { EtiquetteDotsCompact } from "@/components/etiquette/EtiquetteDotsCompac
 import type { CallSummary } from "@/types/call";
 import { formatDurationShort } from "@/utils/formatters";
 import { labelForCallStatus, toneForCallStatus } from "@/utils/tone";
-import { ManagerAttentionScore } from "@/components/attention/ManagerAttentionScore";
+import { AttentionScoreStatusPill } from "@/components/attention/AttentionScoreStatusPill";
 
 export type CallRowDensity = "comfortable" | "compact";
 
@@ -16,11 +16,17 @@ export interface CallRowProps {
   onOpen: (call: CallSummary) => void;
   density?: CallRowDensity;
   showActions?: boolean;
+  /** Set by the page, not derived per-row, so every row in a list shares
+   * one grid template and lines up with a matching table header. */
+  wideScore?: boolean;
 }
 
-const Row = styled.div<{ $density: CallRowDensity; $showActions: boolean }>`
+const Row = styled.div<{ $density: CallRowDensity; $showActions: boolean; $wideScore: boolean }>`
   display: grid;
-  grid-template-columns: ${({ $showActions }) => ($showActions ? "1.5fr 2.6fr 52px 168px 138px 60px" : "1.5fr 2.6fr 52px 168px 138px")};
+  grid-template-columns: ${({ $showActions, $wideScore }) => {
+    if ($wideScore) return "1.5fr 2.6fr 52px 168px 198px";
+    return $showActions ? "1.5fr 2.6fr 52px 168px 138px 60px" : "1.5fr 2.6fr 52px 168px 138px";
+  }};
   gap: 18px;
   align-items: center;
   width: 100%;
@@ -99,21 +105,6 @@ const PrimaryReason = styled.div`
   color: ${({ theme }) => theme.colors.chip.red.fg};
 `;
 
-const AttentionFlags = styled.div`
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-`;
-
-const AttentionFlag = styled.span`
-  padding: 4px 7px;
-  border-radius: ${({ theme }) => theme.radii.full};
-  background: ${({ theme }) => theme.colors.surface.muted};
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: 9.5px;
-  font-weight: 750;
-`;
-
 const Duration = styled.div`
   font-size: 13px;
   font-weight: 700;
@@ -174,30 +165,15 @@ const Actions = styled.div`
   color: ${({ theme }) => theme.colors.icon.faint};
 `;
 
-const IconButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: inherit;
-  border-radius: ${({ theme }) => theme.radii.full};
-  transition: color 0.18s ease, transform 0.18s ease;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.text.secondary};
-  }
-
-  &:active {
-    transform: scale(0.9);
-  }
-`;
-
-export function CallRow({ call, onOpen, density = "comfortable", showActions = false }: Readonly<CallRowProps>) {
+export function CallRow({ call, onOpen, density = "comfortable", showActions = false, wideScore = false }: Readonly<CallRowProps>) {
+  const showArrow = showActions && !wideScore;
   return (
     <Row
       role="button"
       tabIndex={0}
       $density={density}
-      $showActions={showActions}
+      $showActions={showArrow}
+      $wideScore={wideScore}
       onClick={() => onOpen(call)}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -215,7 +191,7 @@ export function CallRow({ call, onOpen, density = "comfortable", showActions = f
           {call.managerAttention && <PrimaryReason>{call.managerAttention.primaryReason}</PrimaryReason>}
           <small>
             {call.managerAttention
-              ? `Agent: ${call.agentName} · Waiting ${call.managerAttention.waitingHours}h${call.managerAttention.additionalReasons.includes("SLA overdue") ? " · SLA overdue" : ""}`
+              ? `Agent: ${call.agentName} · Waiting ${call.managerAttention.waitingHours}h`
               : <>{call.kind === "recurring-group" && call.callCount ? `${call.callCount} calls · ` : ""}
                 {call.agentName} · {call.customerName} {call.customerRef}</>}
           </small>
@@ -240,36 +216,18 @@ export function CallRow({ call, onOpen, density = "comfortable", showActions = f
 
       <Duration>{formatDurationShort(call.durationSeconds)}</Duration>
 
-      {call.managerAttention ? (
-        <AttentionFlags>
-          {call.managerAttention.additionalReasons.length > 0
-            ? call.managerAttention.additionalReasons.map((reason) => <AttentionFlag key={reason}>{reason}</AttentionFlag>)
-            : <AttentionFlag>No additional flags</AttentionFlag>}
-        </AttentionFlags>
-      ) : <EtiquetteDotsCompact rules={call.etiquette} />}
+      <EtiquetteDotsCompact rules={call.etiquette} hideTrailingCount={Boolean(call.managerAttention)} />
 
-      <div style={{ justifySelf: "start" }}>
+      <div style={call.managerAttention ? { minWidth: 0 } : { justifySelf: "start" }}>
         {call.managerAttention
-          ? <ManagerAttentionScore score={call.managerAttention.score} label={call.managerAttention.urgencyLabel} size="standard" />
+          ? <AttentionScoreStatusPill score={call.managerAttention.score} status={call.status} />
           : <StatusPill status={call.status} />}
       </div>
 
-      {showActions && call.kind !== "recurring-group" && (
-        <Actions>
-          <IconButton
-            as="a"
-            href={call.audioUrl}
-            download={`call-${call.externalId}.mp3`}
-            aria-label="Download recording"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <Download size={16} />
-          </IconButton>
-          <ChevronRight size={18} aria-hidden />
+      {showArrow && (
+        <Actions aria-label="Open detail page">
+          <ArrowUpRight size={18} aria-hidden />
         </Actions>
-      )}
-      {showActions && call.kind === "recurring-group" && (
-        <Actions><ChevronRight size={18} aria-hidden /></Actions>
       )}
     </Row>
   );

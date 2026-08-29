@@ -6,6 +6,7 @@ import type { HeatmapLevel } from "@/types/agent";
 import type { CustomerSummary } from "@/types/customer";
 
 const CustomerCardSurface = styled.button<{ $outcome: HeatmapLevel }>`
+  position: relative;
   width: 100%;
   min-height: 252px;
   height: 100%;
@@ -15,7 +16,6 @@ const CustomerCardSurface = styled.button<{ $outcome: HeatmapLevel }>`
   text-align: left;
   overflow: hidden;
   border: 1px solid ${({ $outcome, theme }) => theme.colors.heatmap[$outcome]};
-  border-left-width: 5px;
   border-radius: ${({ theme }) => theme.radii.card};
   background: ${({ $outcome, theme }) => {
     const tint = $outcome === "good" ? theme.colors.chip.green.bg
@@ -28,11 +28,25 @@ const CustomerCardSurface = styled.button<{ $outcome: HeatmapLevel }>`
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: ${({ theme }) => theme.colors.chip.green.bg};
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
   @media (hover: hover) {
     &:hover {
       transform: translateY(-3px);
       box-shadow: ${({ theme }) => theme.shadows.cardHover};
       border-color: ${({ theme }) => theme.colors.accent.green};
+    }
+
+    &:hover::after {
+      opacity: 0.65;
     }
   }
 

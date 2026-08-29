@@ -13,6 +13,7 @@ export type BackendTextualTone =
 
 export interface BackendManagerAttention {
   score: number;
+  raw_score: number;
   urgency_label: string;
   primary_reason: string;
   additional_reasons: string[];
@@ -68,7 +69,7 @@ export interface BackendCallListResponse {
 export interface BackendAttentionSummary {
   total: number;
   highest: BackendManagerAttention | null;
-  categories: { rude: number; recurring_unresolved: number; unresolved: number; quality_reviews: number; other: number };
+  categories: { rude: number; unresolved: number; etiquette_issues: number; recurring: number; other: number };
 }
 
 export interface BackendCustomerSummary {

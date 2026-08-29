@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { CallList } from "@/components/call/CallList";
+import { CallTable } from "@/components/call/CallTable";
 import { Avatar } from "@/components/primitives/Avatar";
 import { Card } from "@/components/primitives/Card";
 import { useAsync } from "@/hooks/useAsync";
@@ -87,18 +87,6 @@ const KpiLabel = styled.div`
   color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
-const TableHead = styled.div`
-  display: grid;
-  grid-template-columns: 1.5fr 2.6fr 52px 168px 138px 60px;
-  gap: 18px;
-  padding: 10px 12px;
-  font-size: 10.5px;
-  color: ${({ theme }) => theme.colors.text.faintAlt};
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-`;
-
 const Footer = styled.div`
   display: flex;
   align-items: center;
@@ -165,14 +153,9 @@ export function CustomerDetailPage() {
       </Kpis>
 
       <Card padding="none" style={{ padding: "16px 26px 24px" }}>
-        <TableHead>
-          <span>Customer / summary</span><span>Sentiment waveform</span><span>Time</span>
-          <span>Etiquette</span><span>Status</span><span />
-        </TableHead>
-        <CallList
+        <CallTable
           calls={customer.calls}
           onOpen={(call) => navigate(`/calls/${call.id}`)}
-          showActions
           emptyMessage="No calls recorded for this customer."
         />
         <Footer>

@@ -31,6 +31,37 @@ const Rail = styled.nav`
   top: 34px;
 `;
 
+const IconWrap = styled.div`
+  position: relative;
+  display: flex;
+
+  &:hover > span {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+  }
+`;
+
+const IconTooltip = styled.span`
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-top: 8px;
+  padding: 5px 9px;
+  border-radius: ${({ theme }) => theme.radii.pillSm};
+  background: ${({ theme }) => theme.colors.text.primary};
+  color: ${({ theme }) => theme.colors.text.onAccent};
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -3px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  pointer-events: none;
+  z-index: 50;
+`;
+
 const IconCircle = styled.button<{ $active: boolean }>`
   width: 44px;
   height: 44px;
@@ -71,17 +102,26 @@ export function SidebarNav({ activeKey, onNavigate }: Readonly<SidebarNavProps>)
   return (
     <Rail aria-label="Primary">
       {navItems.map(({ key, label, Icon }) => (
-        <IconCircle key={key} type="button" title={label} aria-label={label} $active={activeKey === key} onClick={() => onNavigate(key)}>
-          <Icon size={19} strokeWidth={1.7} />
-        </IconCircle>
+        <IconWrap key={key}>
+          <IconCircle type="button" aria-label={label} $active={activeKey === key} onClick={() => onNavigate(key)}>
+            <Icon size={19} strokeWidth={1.7} />
+          </IconCircle>
+          <IconTooltip>{label}</IconTooltip>
+        </IconWrap>
       ))}
       <Spacer />
-      <IconCircle type="button" title="Settings" aria-label="Settings" $active={activeKey === "settings"} onClick={() => onNavigate("settings")}>
-        <Settings size={19} strokeWidth={1.7} />
-      </IconCircle>
-      <IconCircle type="button" title="Not implemented" aria-label="Not implemented" $active={false}>
-        <LogOut size={19} strokeWidth={1.7} />
-      </IconCircle>
+      <IconWrap>
+        <IconCircle type="button" aria-label="Settings" $active={activeKey === "settings"} onClick={() => onNavigate("settings")}>
+          <Settings size={19} strokeWidth={1.7} />
+        </IconCircle>
+        <IconTooltip>Settings</IconTooltip>
+      </IconWrap>
+      <IconWrap>
+        <IconCircle type="button" aria-label="Not implemented" $active={false}>
+          <LogOut size={19} strokeWidth={1.7} />
+        </IconCircle>
+        <IconTooltip>Log out</IconTooltip>
+      </IconWrap>
     </Rail>
   );
 }

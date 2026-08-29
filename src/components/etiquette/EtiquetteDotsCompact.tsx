@@ -61,7 +61,13 @@ const Count = styled.span<{ $fg: string }>`
   color: ${({ $fg }) => $fg};
 `;
 
-export function EtiquetteDotsCompact({ rules }: Readonly<{ rules: EtiquetteRuleResult[] }>) {
+export interface EtiquetteDotsCompactProps {
+  rules: EtiquetteRuleResult[];
+  /** Hides the trailing "pass/total" text, showing just the circles — e.g. in the attention queue. */
+  hideTrailingCount?: boolean;
+}
+
+export function EtiquetteDotsCompact({ rules, hideTrailingCount }: Readonly<EtiquetteDotsCompactProps>) {
   const theme = useTheme();
   const applicableRules = rules.filter((rule) => rule.status !== "n/a");
   const passCount = applicableRules.filter((rule) => rule.status === "pass").length;
@@ -94,7 +100,7 @@ export function EtiquetteDotsCompact({ rules }: Readonly<{ rules: EtiquetteRuleR
           </Circle>
         );
       })}
-      <Count $fg={countColor}>{passCount}/{applicableRules.length}</Count>
+      {!hideTrailingCount && <Count $fg={countColor}>{passCount}/{applicableRules.length}</Count>}
     </Stack>
   );
 }

@@ -259,6 +259,7 @@ export function mapCallListItem(item: BackendCallListItem): CallSummary {
     needsManagerAttention: item.needs_manager_attention,
     managerAttention: item.manager_attention ? {
       score: item.manager_attention.score,
+      rawScore: item.manager_attention.raw_score,
       urgencyLabel: item.manager_attention.urgency_label,
       primaryReason: item.manager_attention.primary_reason,
       additionalReasons: item.manager_attention.additional_reasons,
