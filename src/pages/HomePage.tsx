@@ -21,6 +21,7 @@ import { Maximize2, X } from "lucide-react";
 type HomeFilter = "All" | "Resolved" | "Recurring" | "Dropped" | "Rude";
 
 const AGENT_RULE_CALLS_LIMIT = 30;
+const COACHING_INSIGHT_VIDEO_URL = "https://pub-0ca6da575fa54913ac646f0806a77d62.r2.dev/assets/coaching-insight-17556379.mp4";
 
 const Stack = styled.div`
   display: flex;
@@ -474,7 +475,7 @@ export function HomePage() {
           <CoachingCard padding="content">
             <CoachingVideoRing aria-hidden="true">
               <CoachingVideo
-                src="/api/v1/assets/coaching-insight-video"
+                src={COACHING_INSIGHT_VIDEO_URL}
                 autoPlay
                 loop
                 muted
