@@ -6,7 +6,9 @@ import { getJson } from "./apiClient";
 import { mapCallDetail, mapCallListItem, mapRecurringGroupDetail, mapRecurringGroupListItem } from "./mappers";
 
 function matchesFilter(call: CallSummary, filter: CallsFilter): boolean {
-  if (filter.status === "attention" && !call.needsManagerAttention) return false;
+  if (filter.status === "attention" && call.kind !== "recurring-group"
+    && call.status !== "recurring" && call.status !== "unresolved"
+    && call.status !== "requires-review" && !call.isRude) return false;
   if (filter.status && filter.status !== "attention" && call.status !== filter.status) return false;
   if (filter.agentId && call.agentId !== filter.agentId) return false;
   if (filter.search) {
