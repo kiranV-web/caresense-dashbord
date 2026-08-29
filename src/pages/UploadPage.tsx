@@ -115,6 +115,14 @@ function currentStage(batch: BatchProgress): number {
   return 5;
 }
 
+function batchFailureMessage(batch: BatchProgress): string {
+  if (batch.failure_details && typeof batch.failure_details === "object" &&
+      "message" in batch.failure_details && typeof batch.failure_details.message === "string") {
+    return batch.failure_details.message;
+  }
+  return batch.failure_reason ?? "The batch could not be processed.";
+}
+
 function processingDetail(batch: BatchProgress): string {
   if (batch.processing_state === "CANCELLED") return "Processing stopped by the user.";
   if (batch.processing_state === "UPLOADED") return "ZIP received · waiting for validation to begin";
@@ -122,7 +130,7 @@ function processingDetail(batch: BatchProgress): string {
   if (batch.processing_state === "TRANSCRIBING") return `${batch.transcription.completed ?? 0} of ${batch.transcription.total} recordings transcribed · ${batch.transcription.active ?? 0} active · ${batch.transcription.queued ?? 0} queued`;
   if (batch.processing_state === "ANALYZING") return `${batch.analysis.completed ?? 0} of ${batch.analysis.total} calls analysed · ${batch.analysis.active ?? 0} active · ${batch.analysis.queued ?? 0} queued`;
   if (batch.processing_state === "LINKING_RECURRING_CALLS") return `${batch.recurrence.completed ?? 0} of ${batch.recurrence.total} calls checked for recurrence · ${batch.recurrence.active ?? 0} active`;
-  if (batch.processing_state === "FAILED") return batch.failure_reason ?? "The batch could not be processed.";
+  if (batch.processing_state === "FAILED") return batchFailureMessage(batch);
   const rejected = Math.max(batch.failed_calls, batch.invalid_pairs);
   return `${batch.uploaded_calls} calls accepted and processed${rejected > 0 ? ` · ${rejected} rejected` : ""}`;
 }

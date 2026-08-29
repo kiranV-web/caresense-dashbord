@@ -70,13 +70,21 @@ function clearMissingBatch(cause: unknown): boolean {
   return true;
 }
 
+function batchFailureMessage(batch: BatchProgress): string {
+  if (batch.failure_details && typeof batch.failure_details === "object" &&
+      "message" in batch.failure_details && typeof batch.failure_details.message === "string") {
+    return batch.failure_details.message;
+  }
+  return batch.failure_reason ?? "The batch could not be processed.";
+}
+
 async function finish(batch: BatchProgress): Promise<void> {
   if (finalizingBatchId === batch.batch_id) return;
   finalizingBatchId = batch.batch_id;
   update({
     batch,
     phase: batch.processing_state === "CANCELLED" ? "cancelled" : batch.processing_state === "FAILED" ? "failed" : "complete",
-    error: batch.processing_state === "FAILED" ? batch.failure_reason ?? "The batch could not be processed." : undefined,
+    error: batch.processing_state === "FAILED" ? batchFailureMessage(batch) : undefined,
   });
   try {
     const issues = await getBatchIssues(batch.batch_id);
