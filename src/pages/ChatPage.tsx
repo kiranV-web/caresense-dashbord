@@ -181,7 +181,7 @@ export function ChatPage() {
       </ConversationCard>
 
       <SidebarStack>
-        <ChatSkillsSidebar />
+        <ChatSkillsSidebar onSelectSkill={(prompt) => void submit(prompt)} disabled={sending} />
       </SidebarStack>
     </Grid>
   );

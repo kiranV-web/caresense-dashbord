@@ -1,4 +1,4 @@
-import type { ChatMessage, ChatThread, ReferencedCall } from "@/types/chat";
+import type { ChatMessage, ChatTable, ChatThread, ReferencedCall } from "@/types/chat";
 import { mockChatThread } from "./mocks/chat.mock";
 import { postJson } from "./apiClient";
 import { getCallDetail } from "./callsService";
@@ -8,6 +8,7 @@ import { formatDurationShort } from "@/utils/formatters";
 interface ChatApiResponse {
   answer: string;
   cited_external_call_ids: string[];
+  table: ChatTable | null;
 }
 
 export interface ChatReply {
@@ -53,7 +54,7 @@ export async function sendMessage(text: string): Promise<ChatReply> {
   appendTurn("assistant", response.answer);
   const referencedCalls = await resolveReferencedCalls(response.cited_external_call_ids);
   return {
-    message: { id: `msg-${Date.now()}`, author: "agent", text: response.answer },
+    message: { id: `msg-${Date.now()}`, author: "agent", text: response.answer, table: response.table ?? undefined },
     referencedCalls,
   };
 }

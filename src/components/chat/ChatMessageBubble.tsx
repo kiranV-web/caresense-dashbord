@@ -1,5 +1,6 @@
 import styled, { useTheme } from "styled-components";
 import type { ChatMessage } from "@/types/chat";
+import { ChatDataTable } from "./ChatDataTable";
 
 const Wrap = styled.div<{ $align: string }>`
   display: flex;
@@ -14,6 +15,10 @@ const Label = styled.span`
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: ${({ theme }) => theme.colors.text.faintAlt};
+`;
+
+const TableWrap = styled.div`
+  max-width: 92%;
 `;
 
 const Bubble = styled.div<{ $bg: string; $fg: string; $maxWidth: string }>`
@@ -40,6 +45,11 @@ export function ChatMessageBubble({ message }: Readonly<{ message: ChatMessage }
       >
         {message.text}
       </Bubble>
+      {message.table && (
+        <TableWrap>
+          <ChatDataTable table={message.table} />
+        </TableWrap>
+      )}
     </Wrap>
   );
 }
