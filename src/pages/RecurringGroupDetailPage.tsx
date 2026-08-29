@@ -122,9 +122,11 @@ const Rail = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 100%;
 `;
 
 const Dot = styled.div`
+  flex: none;
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -136,10 +138,16 @@ const Dot = styled.div`
   font-weight: 900;
 `;
 
-const Line = styled.div`
-  width: 2px;
+// flex:1 on both segments (even the hidden one) keeps the dot vertically
+// centred in the tile regardless of position — visibility:hidden preserves
+// the segment's space without drawing it, so the first item's top half and
+// the last item's bottom half stay blank instead of a stray dotted stub.
+const RailSegment = styled.div<{ $visible: boolean }>`
   flex: 1;
-  background: ${({ theme }) => theme.colors.line.input};
+  width: 0;
+  min-height: 8px;
+  border-left: 2px dotted ${({ theme }) => theme.colors.line.input};
+  visibility: ${({ $visible }) => ($visible ? "visible" : "hidden")};
 `;
 
 const CallCard = styled(Card)<{ $isRecurring: boolean }>`
@@ -239,8 +247,9 @@ export function RecurringGroupDetailPage() {
           {group.calls.map((call, index) => (
             <TimelineItem key={call.id}>
               <Rail>
+                <RailSegment $visible={index > 0} />
                 <Dot>{call.sequenceNumber}</Dot>
-                {index < group.calls.length - 1 && <Line />}
+                <RailSegment $visible={index < group.calls.length - 1} />
               </Rail>
               <CallCard padding="content" $isRecurring={call.status === "recurring"} onClick={() => navigate(`/calls/${call.id}`)}>
                 <CallHead>
