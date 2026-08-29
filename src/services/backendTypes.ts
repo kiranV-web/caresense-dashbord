@@ -193,9 +193,12 @@ export interface BackendTeamActivityCall {
   agent_id: string;
   external_call_id: string;
   started_at: string;
-  resolution_status: BackendResolutionStatus;
+  // Null when the call never reached analysis (e.g. a transcription failure) —
+  // status_label is the backend's own safe, always-present fallback for this.
+  resolution_status: BackendResolutionStatus | null;
+  status_label: string;
   call_statuses: BackendCallStatus[];
-  needs_manager_attention: boolean;
+  needs_manager_attention: boolean | null;
 }
 
 export interface BackendTeamAgent {

@@ -16,7 +16,7 @@ function activityLevel(call: BackendTeamActivityCall): HeatmapLevel {
 
 export function mapActivityCall(call: BackendTeamActivityCall): HeatmapCell {
   const level = activityLevel(call);
-  const outcome = level === "rude" ? "needs review" : call.resolution_status.toLowerCase();
+  const outcome = level === "rude" ? "needs review" : call.status_label.toLowerCase();
   return {
     level,
     tooltip: `${call.external_call_id} · ${new Date(call.started_at).toLocaleString()} · ${outcome}`,
