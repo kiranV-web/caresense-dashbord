@@ -110,7 +110,8 @@ const GroupStep = styled.div<{ $tone: ReturnType<typeof toneForCallStatus> }>`
 const GroupStepLabel = styled.div`
   font-size: 10.5px;
   font-weight: 900;
-  white-space: nowrap;
+  line-height: 1.35;
+  overflow-wrap: break-word;
 `;
 
 const GroupStepTitle = styled.div`
@@ -118,9 +119,8 @@ const GroupStepTitle = styled.div`
   color: ${({ theme }) => theme.colors.text.secondary};
   font-size: 10.5px;
   font-weight: 650;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.35;
+  overflow-wrap: break-word;
 `;
 
 const GroupConnector = styled.div`
