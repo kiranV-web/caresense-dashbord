@@ -98,13 +98,6 @@ const RankBadge = styled.div`
   font-variant-numeric: tabular-nums;
 `;
 
-const PrimaryReason = styled.div`
-  margin-top: 2px;
-  font-size: 11.5px;
-  font-weight: 800;
-  color: ${({ theme }) => theme.colors.chip.red.fg};
-`;
-
 const Duration = styled.div`
   font-size: 13px;
   font-weight: 700;
@@ -188,7 +181,6 @@ export function CallRow({ call, onOpen, density = "comfortable", showActions = f
           : <Avatar initials={call.avatarInitials} tintIndex={call.avatarTintIndex} />}
         <CustomerText>
           <strong>{call.title}</strong>
-          {call.managerAttention && <PrimaryReason>{call.managerAttention.primaryReason}</PrimaryReason>}
           <small>
             {call.managerAttention
               ? `Agent: ${call.agentName} · Waiting ${call.managerAttention.waitingHours}h`
