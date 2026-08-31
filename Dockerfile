@@ -35,10 +35,12 @@ ENV API_HOST=api \
     API_PORT=3000 \
     NGINX_ENVSUBST_FILTER=^(API_HOST|API_PORT|SERVER_NAME|CERT_DOMAIN)$
 
-EXPOSE 80
+EXPOSE 80 443
 # 127.0.0.1, not "localhost" — on some Docker hosts "localhost" resolves to
 # ::1 first and IPv6 loopback doesn't route cleanly inside the container,
 # making wget report "connection refused" even while nginx is healthy and
-# actively serving real external requests.
+# actively serving real external requests. Checked over HTTPS since port 80
+# now only 301-redirects there; --no-check-certificate because the cert's
+# hostname (the real domain) will never match the loopback address.
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget -qO- http://127.0.0.1/ >/dev/null 2>&1 || exit 1
+    CMD wget --no-check-certificate -qO- https://127.0.0.1/ >/dev/null 2>&1 || exit 1
