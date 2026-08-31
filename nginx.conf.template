@@ -1,8 +1,23 @@
+# Plain HTTP just redirects to HTTPS. Certbot renewal uses the standalone
+# plugin with pre/post hooks that stop/start this container (see the deploy
+# runbook), not a webroot challenge — so no ACME exception is needed here.
 server {
     listen 80;
-    server_name _;
+    server_name ${SERVER_NAME};
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name ${SERVER_NAME};
     root /usr/share/nginx/html;
     index index.html;
+
+    ssl_certificate     /etc/letsencrypt/live/${CERT_DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${CERT_DOMAIN}/privkey.pem;
 
     # Docker's embedded DNS. Resolving the upstream through a variable (below)
     # instead of a bare proxy_pass hostname defers resolution to request time
