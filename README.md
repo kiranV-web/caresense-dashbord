@@ -17,15 +17,15 @@ The admin dashboard for CareSense: the customer list, each customer's full call 
 
 | Route | What it shows |
 |---|---|
-| `/` | Home dashboard — KPIs, the "Requires attention" tile (count + top reasons, click through to the ranked queue), the conversation-quality radar, reported-issue trends, the AI coaching insight, and a recent-calls preview |
-| `/calls` | The full call list, with filter chips including **Requires attention** — the ranked, score-first manager queue |
-| `/calls/:id` | Call detail — playable recording synced to the transcript, per-segment speaker/timestamp/mood, the AI summary and resolution verdict, the 7-rule etiquette check with quoted evidence per rule, and (for flagged calls) the attention score with a hover breakdown of exactly how it was calculated |
-| `/customers` | Every customer, searchable by caller ID or logged name |
-| `/customers/:id` | One customer's complete call history — every recording and transcript they're attached to |
+| `/` | Home dashboard — KPIs, a **Requires attention** tile showing the active count, highest score/urgency, and category breakdown, plus conversation quality, reported-issue trends, AI coaching, and recent calls |
+| `/calls` | The full call list. **Requires attention** switches to an individually ranked, score-first queue where every row shows rank, numeric score, urgency, primary reason, additional flags, and waiting time. |
+| `/calls/:id` | Call detail — playable recording synced to the transcript, speaker/timestamp/mood data, AI summary, resolution and etiquette results, plus (when applicable) a prominent attention score with expandable factors, rank, calculation time, and previous/next attention navigation |
+| `/customers` | Caller directory grouped by caller ID, searchable by caller ID or any logged name. Cards show name aliases, totals, and outcome-coloured call-history dots. |
+| `/customers/:id` | One caller ID's complete call history. Different names logged against that ID remain visible as aliases; selecting a call opens the existing call-detail route. |
 | `/team` | Per-agent call volumes, handle times, and outcomes, plus a heatmap of etiquette performance across the team |
 | `/team/:agentId` | One agent's activity heatmap, etiquette pass/fail breakdown, and recent calls |
 | `/recurring-groups/:id` | A recurring-issue cluster — the AI's verdict, recommended action, and the timeline of every call in it |
-| `/upload` | Drag-and-drop ZIP upload with live progress — safe to refresh mid-upload; processing continues server-side and progress picks back up on reload |
+| `/upload` | Drag-and-drop ZIP upload with client validation, byte-upload progress, live processing stages, per-file errors, and batch cancellation. After the API returns a batch ID, processing survives navigation or refresh and progress is restored from the server. |
 | `/chat` | The chat agent — ask a question in plain English, answered from real call data via ~20 predefined data functions, not free-text generation |
 | `/settings` | Recurrence lookback window, ideal call duration, enabled etiquette rules |
 
@@ -35,13 +35,19 @@ On the call-detail page, the sentiment waveform and transcript are colour-coded 
 
 ### The attention score, consistently everywhere
 
-The same score, urgency label, and reasons appear identically on the Home tile, the attention-queue rows, and the call-detail page — the frontend never recalculates it; every view reads the same number from the API. A score of 99 is the ceiling and means the call needs direct manager review now.
+The frontend never calculates or infers attention scores. It renders the backend's shared score object through `ManagerAttentionScore`: `compact` on Home, `standard` in queue rows, and `prominent` on call detail.
+
+- Home shows the active count, highest current numeric score and urgency label, plus the category breakdown—never an average.
+- The queue is sorted by the backend and shows each call's rank, score, urgency, primary reason, additional flags, and waiting time without expanding the row.
+- Call detail shows the same result beside the title and exposes **Why this score?**, factor values, calculation time, queue position, and previous/next attention calls.
+
+The backend caps scores at 99. Numeric scores are always paired with their text label; colour is supplementary, not the only signal.
 
 ## Environment variables (build-time)
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `VITE_API_BASE_URL` | *(blank)* | Leave blank in production — API calls go through the same-origin Nginx proxy. Set only for pointing at a different API host in development. |
+| `VITE_API_BASE_URL` | *(blank)* | Optional base URL for upload/progress requests. Leave blank for the normal same-origin Vite/Nginx proxy. Other dashboard reads currently use same-origin `/api` paths. |
 | `VITE_MAX_UPLOAD_BYTES` | `209715200` (200 MB) | Client-side upload size guard, shown in the upload UI |
 | `VITE_SHOW_TRANSCRIPT_TONE` | `true` | Toggles the per-line mood label in the transcript view |
 
@@ -49,7 +55,7 @@ The same score, urgency label, and reasons appear identically on the Home tile, 
 
 ### Local development
 
-Requires the backend running first (see `careSense-server`'s README) — its dev server listens on `:1000` by default, which is what this dashboard's Vite dev server proxies `/api` to (`vite.config.ts`).
+Requires Node.js 22 or newer and the backend running first (see `careSense-server`'s README). The backend's example environment listens on `:1000`, which is where this dashboard's Vite server proxies `/api` (`vite.config.ts`).
 
 ```bash
 npm install

@@ -97,6 +97,27 @@ const AgentSelect = styled.select`
   }
 `;
 
+const LoggedNames = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+  flex-wrap: wrap;
+  max-width: 360px;
+`;
+
+const LoggedNameCapsule = styled.span`
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: ${({ theme }) => theme.radii.full};
+  background: ${({ theme }) => theme.colors.surface.muted};
+  color: ${({ theme }) => theme.colors.text.secondary};
+  font-size: 10px;
+  font-weight: 750;
+`;
+
 const RadarLoading = styled.div`
   padding: 60px 12px;
   text-align: center;
@@ -352,11 +373,10 @@ export function HomePage() {
   const [selectedRule, setSelectedRule] = useState<string | null>(null);
 
   const defaultAgentId = useMemo(() => {
-    if (!team || team.agents.length === 0) return undefined;
-    return team.agents.reduce((busiest, agent) =>
-      agent.callsCount > busiest.callsCount ? agent : busiest).id;
+    if (!team || team.qualityAgents.length === 0) return undefined;
+    return team.qualityAgents[0]?.id;
   }, [team]);
-  const selectedAgentId = selectedAgentOverride && team?.agents.some((agent) => agent.id === selectedAgentOverride)
+  const selectedAgentId = selectedAgentOverride && team?.qualityAgents.some((agent) => agent.id === selectedAgentOverride)
     ? selectedAgentOverride
     : defaultAgentId;
 
@@ -431,7 +451,7 @@ export function HomePage() {
             </div>
             <RadarHeadRight>
               {quality && <AdherenceValue>{quality.overallAdherencePercent}% overall adherence</AdherenceValue>}
-              {team && team.agents.length > 0 && (
+              {team && team.qualityAgents.length > 0 && (
                 <AgentSelect
                   value={selectedAgentId ?? ""}
                   onChange={(event) => {
@@ -440,10 +460,16 @@ export function HomePage() {
                   }}
                   aria-label="Select agent"
                 >
-                  {team.agents.map((agent) => (
-                    <option key={agent.id} value={agent.id}>{agent.name}</option>
+                  {team.qualityAgents.map((agent) => (
+                    <option key={agent.id} value={agent.id}>Agent ID {agent.id} · {agent.callsCount} calls</option>
                   ))}
                 </AgentSelect>
+              )}
+              {quality && (
+                <LoggedNames aria-label="Names logged for this agent ID">
+                  {quality.loggedNames.map((name) => <LoggedNameCapsule key={name}>{name}</LoggedNameCapsule>)}
+                  {quality.loggedNames.length === 0 && <LoggedNameCapsule>Name unavailable</LoggedNameCapsule>}
+                </LoggedNames>
               )}
             </RadarHeadRight>
           </CardHeadRow>
@@ -506,7 +532,7 @@ export function HomePage() {
           <Spacer />
           {selectedRule ? (
             <RuleFilterChip type="button" onClick={() => setSelectedRule(null)}>
-              {quality?.agentName} failed “{selectedRuleLabel}”
+              Agent ID {quality?.agentId} failed “{selectedRuleLabel}”
               <X size={13} strokeWidth={2.5} />
             </RuleFilterChip>
           ) : (

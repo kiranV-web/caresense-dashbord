@@ -9,7 +9,13 @@ export interface RuleQualityPoint {
 
 export interface AgentConversationQuality {
   agentId: string;
-  agentName: string;
+  loggedNames: string[];
   overallAdherencePercent: number;
   rules: RuleQualityPoint[];
+}
+
+export interface QualityAgentIdentity {
+  id: string;
+  loggedNames: string[];
+  callsCount: number;
 }

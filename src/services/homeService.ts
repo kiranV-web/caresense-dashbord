@@ -97,12 +97,14 @@ export async function getHomeSummary(): Promise<HomeSummary> {
       ],
     },
     attention: {
-      count: attentionSummary.total,
+      // The tile only breaks attention down into rude/unresolved/recurring, so its headline
+      // count matches those three chips exactly — not the backend's broader attention queue,
+      // which also includes quality-only flags with no dedicated chip here.
+      count: attentionSummary.categories.rude + attentionSummary.categories.unresolved + attentionSummary.categories.recurring,
       chips: [
         `${attentionSummary.categories.rude} rude`,
         `${attentionSummary.categories.unresolved} unresolved`,
         `${attentionSummary.categories.recurring} recurring`,
-        `${attentionSummary.categories.etiquette_issues} issues`,
       ],
     },
     issuesByEnquiry: rankFromItems(items, "issue_category", "General enquiry"),

@@ -1,5 +1,5 @@
 import type { Agent, AgentDetail, HeatmapCell, HeatmapLevel } from "@/types/agent";
-import type { AgentConversationQuality } from "@/types/agentQuality";
+import type { AgentConversationQuality, QualityAgentIdentity } from "@/types/agentQuality";
 import type { BackendAgentConversationQuality, BackendDashboardTeam, BackendTeamActivityCall } from "./backendTypes";
 import { getJson } from "./apiClient";
 import { listCallsForAgent } from "./callsService";
@@ -29,6 +29,7 @@ export function mapActivityCall(call: BackendTeamActivityCall): HeatmapCell {
 
 export interface TeamOverview {
   agents: Agent[];
+  qualityAgents: QualityAgentIdentity[];
   activity: HeatmapCell[];
   totals: BackendDashboardTeam["totals"];
   averageDurationSeconds: number | null;
@@ -56,6 +57,11 @@ export async function getTeamOverview(): Promise<TeamOverview> {
     averageDurationSeconds: durationCalls === 0 ? null : Math.round(durationTotal / durationCalls),
     needsReview: team.agents.reduce((sum, agent) => sum + agent.attention_count, 0),
     activity: team.activity.map(mapActivityCall),
+    qualityAgents: team.quality_agents.map((agent) => ({
+      id: agent.id,
+      loggedNames: agent.logged_names,
+      callsCount: agent.call_count,
+    })),
     agents: team.agents.map((agent) => {
       const name = displayName(agent.name, agent.external_id);
       return {
@@ -81,7 +87,7 @@ export async function getAgentConversationQuality(agentId: string): Promise<Agen
   );
   return {
     agentId: data.agent.id,
-    agentName: displayName(data.agent.name, data.agent.external_id),
+    loggedNames: data.agent.logged_names,
     overallAdherencePercent: data.overall_adherence_percent,
     rules: data.rules
       .filter((rule) => rule.agent_pass_percent !== null && rule.total_calls > 0)

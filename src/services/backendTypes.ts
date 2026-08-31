@@ -269,6 +269,7 @@ export interface BackendDashboardTeam {
   period: { date: string; dateFrom: string; dateTo: string; timezone: string };
   totals: { agents: number; calls: number; resolved: number };
   activity: BackendTeamActivityCall[];
+  quality_agents: Array<{ id: string; logged_names: string[]; call_count: number }>;
   agents: BackendTeamAgent[];
 }
 
@@ -282,7 +283,7 @@ export interface BackendAgentQualityRule {
 }
 
 export interface BackendAgentConversationQuality {
-  agent: { id: string; external_id: string; name: string | null };
+  agent: { id: string; external_id: string; logged_names: string[]; call_count: number };
   overall_adherence_percent: number;
   rules: BackendAgentQualityRule[];
 }
