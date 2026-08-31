@@ -25,12 +25,15 @@ COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 
 # Resolved into nginx.conf.template via the official nginx image's envsubst
 # entrypoint at container start (not at build time) — so the SAME image can
-# point at a different backend host/port per environment without a rebuild.
-# Restricted to API_-prefixed vars so envsubst never touches nginx's own
-# $uri/$host/$scheme variables in the template.
+# point at a different backend host/port, domain, and cert per environment
+# without a rebuild. Restricted to exactly these vars so envsubst never
+# touches nginx's own $uri/$host/$scheme variables in the template.
+# SERVER_NAME/CERT_DOMAIN have no default — the template now requires a real
+# Let's Encrypt cert at /etc/letsencrypt/live/$CERT_DOMAIN/, so the container
+# must be run with both set (see the root docker-compose.yml).
 ENV API_HOST=api \
     API_PORT=3000 \
-    NGINX_ENVSUBST_FILTER=^API_
+    NGINX_ENVSUBST_FILTER=^(API_HOST|API_PORT|SERVER_NAME|CERT_DOMAIN)$
 
 EXPOSE 80
 # 127.0.0.1, not "localhost" — on some Docker hosts "localhost" resolves to
