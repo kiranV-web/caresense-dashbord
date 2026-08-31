@@ -2,6 +2,8 @@
 
 The admin dashboard for CareSense: the customer list, each customer's full call history, a per-call view with the playable recording, the transcript, the AI summary and mood timeline, and the ranked "needs a manager's attention today" queue across all calls. Everything on this page is read from the API in the sibling [`careSense-server`](https://github.com/kiranV-web/careSense) repository — that repo's README covers the transcription/analysis pipeline and the manager-attention scoring formula in full; this one covers the frontend.
 
+**Live site:** [https://kirancodez.com/](https://kirancodez.com/)
+
 ## Tech stack
 
 | Layer | Technology |
